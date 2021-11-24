@@ -1,19 +1,24 @@
-""""""
+"""#TODO"""
 
 
 import pandas as pd
 import markdown
-import os
-from utils.utils import pie_feature
+import data.dropped_features.comments_enabled as comments_enabled
+import data.dropped_features.currency as currency
+import data.dropped_features.date_end_extra_time as date_end_extra_time
+import data.dropped_features.lang as lang
+import data.dropped_features.lowest_contribution_amount as lowest_contribution_amount
+import data.dropped_features.timezone as timezone
 
 
-def get_dataframe_from_csv():
+def get_dataframe_from_csv() -> pd.DataFrame:
     """#TODO """
-    print(os.getcwd())
-    return pd.read_csv("new_struct/data/ulule_data.csv", low_memory=False)
+    df = pd.read_csv("new_struct/data/ulule_data.csv", low_memory=False)
+    print("-- Fin de la lecture des données.")
+    return df
 
 
-def understand_data(display_explanations=False):
+def understand_data(display_explanations: bool = False) -> pd.DataFrame:
     """#TODO"""
 
     data = get_dataframe_from_csv()
@@ -91,17 +96,15 @@ def understand_data(display_explanations=False):
         """)
         print(set_analysis)
 
-        date_end_extra_time = markdown.markdown("""##### date_end_extra_time
+        date_end_extra_time_txt = markdown.markdown("""##### date_end_extra_time
         La colonne date_end_extra_time sera retirée car aucun projet ayant échoué n'y a fait appel et c'est un phénomène très minoritaire.""")
-        print(date_end_extra_time)
-        pie_feature("date_end_extra_time",
-                    "Extension de la durée de la campagne")
+        print(date_end_extra_time_txt)
+        date_end_extra_time.show_stats(data)
 
-        lowest_contribution_amount = markdown.markdown("""##### lowest_contribution_amount
+        lowest_contribution_amount_txt = markdown.markdown("""##### lowest_contribution_amount
         Etant quasiment constante, la colonne <b>lowest_contribution_amount</b> peut également être retirée car non pertinente.""")
-        print(lowest_contribution_amount)
-        pie_feature("lowest_contribution_amount",
-                    "Répartition de la contribution minimale au sein des projets")
+        print(lowest_contribution_amount_txt)
+        lowest_contribution_amount.show_stats(data)
 
         committed = markdown.markdown("""##### committed
         La colonne committed concerne les promesses faites par les supporters. Il y a deux cas de figure :
@@ -172,32 +175,30 @@ def understand_data(display_explanations=False):
         Il ne nous a pas semblé pertinent de garder la colonne <b>delivery</b> car elle peut ne pas avoir de sens si le projet n'offre pas de récompense physique (comme un jeu vidéo ou un film).""")
         print(project_data)
 
-        timezone = markdown.markdown("""#####timezone
+        timezone_txt = markdown.markdown("""#####timezone
         L'immense majorité des projets a lieu dans la même zone, la colonne <b>timezone</b> est quasiment constante, elle peut être retirée.""")
-        print(timezone)
-        pie_feature(
-            "timezone", "Répartition de la zone temporelle au sein des projets")
+        print(timezone_txt)
+        timezone.show_stats(data)
 
-        comments_enabled = markdown.markdown("""##### comments_enabled
+        comments_enabled_txt = markdown.markdown("""##### comments_enabled
         Une écrasante majorité des projets autorise les commentaires pour tous les utilisateurs, la colonne <b>comments_enabled</b> n'est donc pas pertinente.""")
-        print(comments_enabled)
-        pie_feature("comments_enabled",
-                    "Répartition des permissions de commentaires")
+        print(comments_enabled_txt)
+        comments_enabled.show_stats(data)
 
-        currency = markdown.markdown("""##### currency
+        currency_txt = markdown.markdown("""##### currency
         L'écrasante majorité des projets est en euro, il est donc possible de retirer la colonne <b>currency</b> ainsi que la colonne <b>currency_display</b>, sans oublier les projets concernés.""")
-        print(currency)
-        pie_feature(
-            "currency", "Répartition de la monnaie utilisée au sein des projets")
+        print(currency_txt)
+        currency.show_stats(data)
 
-        lang = markdown.markdown("""##### lang
+        lang_txt = markdown.markdown("""##### lang
         Les autres langues que le français étant très minoritaires, on peut retirer tous les projets concernés ainsi que les colonnes suivantes :
         - <b>description_[Langue!=fr]</b>
         - <b>description_funding_[Langue!=fr]</b>
         - <b>lang</b>
         - <b>name_[Langue!=fr]</b>
         - <b>subtitle_[Langue!=fr]</b>""")
-        print(lang)
-        pie_feature("lang", "Répartition des langues au sein des projets")
+        print(lang_txt)
+        lang.show_stats(data)
 
+    print("-- Fin de la compréhension")
     return data

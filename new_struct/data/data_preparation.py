@@ -1,8 +1,9 @@
-"""Ce fichier génère un dataframe bien cool"""
+"""#TODO"""
 
 
 import markdown
 import pandas as pd
+import numpy as np
 import ast
 from datetime import datetime
 from data.data_understanding import understand_data
@@ -10,7 +11,8 @@ from data.data_understanding import understand_data
 pd.set_option('display.max_columns', None)
 
 
-def prepare_data(display_explanations=False) -> pd.DataFrame:
+def prepare_data(display_explanations: bool = False) -> pd.DataFrame:
+    """#TODO"""
     data = understand_data(display_explanations=display_explanations)
 
     # Retrait de lignes inutiles
@@ -190,6 +192,21 @@ Dans la mesure où les projets ne se comportent pas de la même façon selon leu
     data['nb_days'] = [days_between(
         data.date_start[k][0:10], data.date_end[k][0:10]) for k in data.date_start.index]
 
+    # news_per_days
+    col = (data["news_count"]/data["nb_days"]
+           ).apply(lambda x: 0 if np.isnan(x) or np.isinf(x) else x)
+    data["news_per_days"] = col
+
+    # rewards
+    def get_nb_rewards(index_project):
+        nb = 0
+        for dictionnary in data.rewards[index_project]:
+            nb += len(dictionnary.keys())
+        return nb
+
+    list_nb_reward = [get_nb_rewards(k) for k in data.rewards.index]
+    data["nb_rewards"] = list_nb_reward
+
     # pre-post Covid
     if display_explanations:
         covid = markdown.markdown(
@@ -213,4 +230,5 @@ Dans la mesure où les projets ne se comportent pas de la même façon selon leu
     # Strictement équivalent au nombre de participants
     data.drop(columns="nb_products_sold", inplace=True)
 
+    print("-- Fin de la préparation.")
     return data
