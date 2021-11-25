@@ -1,19 +1,18 @@
 """#TODO"""
 
 
-import markdown
-import pandas as pd
+from typing import Tuple
+from pandas import DataFrame
 import numpy as np
 import ast
 from datetime import datetime
 from data.data_understanding import understand_data
 
-pd.set_option('display.max_columns', None)
 
-
-def prepare_data(display_explanations: bool = False) -> pd.DataFrame:
+def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, str]:
     """#TODO"""
-    data = understand_data(display_explanations=display_explanations)
+    data, string_to_print = understand_data(
+        display_explanations=display_explanations)
 
     # Retrait de lignes inutiles
     unfinished_projets = data[~data.finished]
@@ -97,19 +96,18 @@ def prepare_data(display_explanations: bool = False) -> pd.DataFrame:
                        'user_role'], inplace=True)
 
     if display_explanations:
-        summary = markdown.markdown("""### Bilan : colonnes restantes
-        Les colonnes suivantes sont conservées dans le dataset, mais peuvent nécessiter un travail supplémentaire, comme la colonne <b>video</b>. Nous n'allons en effet pas étudier la vidéo du projet en elle même mais plutôt le fait qu'elle existe ou non par exemple.
+        summary = """<h3>Bilan : colonnes restantes</h3>
+        <p>Les colonnes suivantes sont conservées dans le dataset, mais peuvent nécessiter un travail supplémentaire, comme la colonne <strong>video</strong>. Nous n'allons en effet pas étudier la vidéo du projet en elle même mais plutôt le fait qu'elle existe ou non par exemple.</p>
 
-        Le set contient une trentaine de colonnes pour environs 40.000 projets.""")
-        print(summary)
-        print(data.columns)
+        <p>Le set contient une trentaine de colonnes pour environs 40.000 projets.</p>"""
+        string_to_print += summary
+        string_to_print += "<p>{}</p>".format(str(data.columns))
 
     # Transformations de données
     # Binarisation
-    summary_transformation = markdown.markdown(
-        """Certaines colonnes doivent être binarisée pour représenter ou non la présence d'un objet (comme une vidéo).""")
+    summary_transformation = """<p>Certaines colonnes doivent être binarisée pour représenter ou non la présence d'un objet (comme une vidéo). Binarisation de <strong>video</strong> et <strong>background</strong></p>"""
     if display_explanations:
-        print(summary_transformation)
+        string_to_print += summary_transformation
 
     def binarize(x):
         return 1 if type(x) == str else 0
@@ -119,9 +117,8 @@ def prepare_data(display_explanations: bool = False) -> pd.DataFrame:
 
     # Owner
     if display_explanations:
-        owner = markdown.markdown(
-            "La colonne owner est inutilisable en tant que telle car seules les stats <b>anonymisées et concernant l'activité publique de lancement de projet</b> de l'owner nous intéressent.")
-        print(owner)
+        owner = "<h5>owner</h5><p>La colonne <strong>owner</strong> est inutilisable en tant que telle car seules les stats <strong>anonymisées et concernant l'activité publique de lancement de projet</strong> de l'owner nous intéressent.</p>"
+        string_to_print += owner
 
     def recup_in_str_owner(x):
         return ast.literal_eval(x['owner'])['stats']
@@ -130,12 +127,12 @@ def prepare_data(display_explanations: bool = False) -> pd.DataFrame:
 
     # Rewards
     if display_explanations:
-        rewards = markdown.markdown("""Pour chaque projet, l'attribut reward propose un certain nombre de rewards dans une liste. Pour chaque reward, plusieurs informations sont disponibles, comme une date de livraison, un nombre de stock etc. Il est possible pour une reward d'avoir plusieurs variantes, par exemple une couleur pour un T-shirt, localisé dans l'attribut 'variants'.
+        rewards = """<h5>rewards</h5><p>Pour chaque projet, l'attribut reward propose un certain nombre de rewards dans une liste. Pour chaque reward, plusieurs informations sont disponibles, comme une date de livraison, un nombre de stock etc. Il est possible pour une reward d'avoir plusieurs variantes, par exemple une couleur pour un T-shirt, localisé dans l'attribut 'variants'.</p>
 
-        Les stocks seront toujours nuls (les projets sont finis) mais il est possible de savoir combien de chacune des rewards ont été prises, et à quel prix. Il est donc possible de voir, pour un projet, ce qui a été le plus rentable i.e. plein de petites rewards ou peu de grosses; et de croiser avec tous les autres projets.
+        <p>Les stocks seront toujours nuls (les projets sont finis) mais il est possible de savoir combien de chacune des rewards ont été prises, et à quel prix. Il est donc possible de voir, pour un projet, ce qui a été le plus rentable i.e. plein de petites rewards ou peu de grosses; et de croiser avec tous les autres projets.</p>
 
-        La colonne doit donc être retravaillée pour extraire une liste de dictionnaires par projet.""")
-        print(rewards)
+        <p>La colonne doit donc être retravaillée pour extraire une liste de dictionnaires par projet.</p>"""
+        string_to_print += rewards
 
     def recup_in_str_rewards(x):
         allowed_keys = ["description_fr", "id",
@@ -154,9 +151,9 @@ def prepare_data(display_explanations: bool = False) -> pd.DataFrame:
 
     # Main_tag
     if display_explanations:
-        main_tag = markdown.markdown("""##### main_tag
-Dans la mesure où les projets ne se comportent pas de la même façon selon leur type, il peut être intéressant d'étudier les tags utilisés pour les décrire. Seuls nous intéressent l'id et le nom en français du tag, il faut donc les extraire.""")
-        print(main_tag)
+        main_tag = """<h5>main_tag</h5>
+<p>Dans la mesure où les projets ne se comportent pas de la même façon selon leur type, il peut être intéressant d'étudier les tags utilisés pour les décrire. Seuls nous intéressent l'id et le nom en français du tag, il faut donc les extraire.</p>"""
+        string_to_print += main_tag
 
     def recup_in_str_main_tag(x):
         if type(x["main_tag"]) == str:
@@ -170,19 +167,22 @@ Dans la mesure où les projets ne se comportent pas de la même façon selon leu
                                 'goal', 'goal_raised', 'id', 'main_tag', 'name_fr', 'news_count', 'owner', 'percent',
                                 'rewards', 'sponsorships_count', 'subtitle_fr', 'supporters_count']
 
+    if display_explanations:
+        string_to_print += "<p>Retrait de lignes incomplètes</p><ul>"
     for col_name in essentials_columns_names:
         index = data.columns.get_loc(col_name)
         index_with_nan = data.index[data.iloc[:, index].isnull()]
         if display_explanations:
-            print("Retrait de {} lignes n'ayant aucun valeur dans la colonne {}".format(
-                len(index_with_nan), col_name))
+            string_to_print += "<li>Retrait de {} lignes n'ayant aucune valeur dans la colonne <strong>{}</strong></li>".format(
+                len(index_with_nan), col_name)
         data.drop(labels=index_with_nan, inplace=True)
+    if display_explanations:
+        string_to_print += "</ul>"
 
     # nb_days
     if display_explanations:
-        nb_days = markdown.markdown(
-            """La colonne "nb_days" contient un tiers de valeurs vides, il faut la compléter.""")
-        print(nb_days)
+        nb_days = """<h5>nb_days</h5><p>La colonne "nb_days" contient un tiers de valeurs vides, il faut la compléter.</p>"""
+        string_to_print += nb_days
 
     def days_between(d1, d2):
         d1 = datetime.strptime(d1, "%Y-%m-%d")
@@ -192,12 +192,15 @@ Dans la mesure où les projets ne se comportent pas de la même façon selon leu
     data['nb_days'] = [days_between(
         data.date_start[k][0:10], data.date_end[k][0:10]) for k in data.date_start.index]
 
-    # news_per_days
+    if display_explanations:
+        string_to_print += "<h5>news_per_days</h5><p>Création de la colonne news_per_days</p>"
     col = (data["news_count"]/data["nb_days"]
            ).apply(lambda x: 0 if np.isnan(x) or np.isinf(x) else x)
     data["news_per_days"] = col
 
-    # rewards
+    if display_explanations:
+        string_to_print += "<h5>nb_rewards</h5><p>Création de la colonne nb_rewards</p>"
+
     def get_nb_rewards(index_project):
         nb = 0
         for dictionnary in data.rewards[index_project]:
@@ -209,9 +212,8 @@ Dans la mesure où les projets ne se comportent pas de la même façon selon leu
 
     # pre-post Covid
     if display_explanations:
-        covid = markdown.markdown(
-            """Nous allons étudier l'influence du COVID-19 sur les campagnes Ulule donc il est intéressant de rajouter une colonne 'post_covid' indiquant si le projet prend fin après le mois de mars 2020.""")
-        print(covid)
+        covid = """<h5>post_covid</h5><p>Nous allons étudier l'influence du COVID-19 sur les campagnes Ulule donc il est intéressant de rajouter une colonne 'post_covid' indiquant si le projet prend fin après le mois de mars 2020. Création de la colonne "post_covid"</p>"""
+        string_to_print += covid
     date_covid = datetime.strptime('2020-03-01', '%Y-%m-%d')
 
     def post_covid(x):
@@ -221,14 +223,15 @@ Dans la mesure où les projets ne se comportent pas de la même façon selon leu
 
     # type
     if display_explanations:
-        type_project = markdown.markdown(
-            """Les projets fonctionnent différemment selon qu'ils concernent des préventes ou une financement. Il convient donc de séparer le set en deux sous-sets.""")
-        print(type_project)
+        type_project = """<h5>type</h5><p>Les projets fonctionnent différemment selon qu'ils concernent des préventes ou une financement. Il convient donc de séparer le set en deux sous-sets.</p>"""
+        string_to_print += type_project
     data_presolds = data[data['type'] == 1]
     data = data[data['type'] == 2]
 
     # Strictement équivalent au nombre de participants
+    if display_explanations:
+        string_to_print += """<h5>nb_products_sold</h5><p>Retrait de la colonne <strong>nb_product_sold</strong> pour les projets n'étant pas sous la forme d'une prévente, car cette colonne est équivalente à la colonne <strong>supporters_count</strong>.</p>"""
     data.drop(columns="nb_products_sold", inplace=True)
 
-    print("-- Fin de la préparation.")
-    return data
+    print("-- Fin de la préparation")
+    return data, string_to_print

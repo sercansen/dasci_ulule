@@ -1,8 +1,8 @@
 """#TODO"""
 
 
+from typing import Tuple
 import pandas as pd
-import markdown
 import data.dropped_features.comments_enabled as comments_enabled
 import data.dropped_features.currency as currency
 import data.dropped_features.date_end_extra_time as date_end_extra_time
@@ -11,194 +11,206 @@ import data.dropped_features.lowest_contribution_amount as lowest_contribution_a
 import data.dropped_features.timezone as timezone
 
 
-def get_dataframe_from_csv() -> pd.DataFrame:
+def _get_dataframe_from_csv() -> pd.DataFrame:
     """#TODO """
     df = pd.read_csv("new_struct/data/ulule_data.csv", low_memory=False)
-    print("-- Fin de la lecture des données.")
+    print("-- Fin de la lecture des données")
     return df
 
 
-def understand_data(display_explanations: bool = False) -> pd.DataFrame:
+def understand_data(display_explanations: bool = False) -> Tuple[pd.DataFrame, str]:
     """#TODO"""
 
-    data = get_dataframe_from_csv()
+    data = _get_dataframe_from_csv()
 
-    drop_useless_columns_explanation = markdown.markdown("""## Vérification du set de données - Data understanding
-    Dans la mesure où certains projets peuvent ou non avoir une vidéo de présentation, il est exclu de retirer toute ligne contenant un "NaN" (représentant un vide). On se contente donc de retirer les doublons et les colonnes constantes, dans un premier temps.""")
+    string_to_print = """"""
+
     if display_explanations:
-        print(drop_useless_columns_explanation)
+        drop_useless_columns_explanation = """<h2>Vérification du set de données - Data understanding</h2>
+    <p>Dans la mesure où certains projets peuvent ou non avoir une vidéo de présentation, il est exclu de retirer toute ligne contenant un "NaN" (représentant un vide). On se contente donc de retirer les doublons et les colonnes constantes, dans un premier temps.</p>"""
+        string_to_print += drop_useless_columns_explanation
+
     # Retrait de doublons.
     data.drop_duplicates(inplace=True)
     # Retrait de colonnes constantes
     data = data.loc[:, (data != data.iloc[0]).any()]
 
     if display_explanations:
-        set_analysis = markdown.markdown("""### Première analyse du set
-        Le set contient près de 50000 lignes correspondant à des
+        set_analysis = """<h3> Première analyse du set</h3>
+        <p>Le set contient près de 50000 lignes correspondant à des
         projets, réussis ou non, et 96 colonnes contenant différents éléments comme
-        le montant levé ou la description du projet dans différentes langues.
+        le montant levé ou la description du projet dans différentes langues.</p>
         
-        Les colonnes peuvent être groupées en quatre catégories :
-        - les données construites par Ulule (comme des listes d'urls)
-        - les données obsolètes ou constantes et qui seront retirées
-        - les données liées au projet (avant le lancement)
-        - les données liées à la campagne (après le lancement)
+        <p>Les colonnes peuvent être groupées en quatre catégories :</p>
+        <ul>
+            <li>les données construites par Ulule (comme des listes d'urls)</li>
+            <li>les données obsolètes ou constantes et qui seront retirées</li>
+            <li>les données liées au projet (avant le lancement)</li>
+            <li>les données liées à la campagne (après le lancement)</li>
+        </ul>
         
-        #### Données construites par Ulule
-        Ces données sont indépendantes du possesseur du projet (l'utilisateur que nous cherchons à conseiller) et <b>ne seront donc pas utilisées dans cette étude</b>.
-        - ~absolute_url~
-        - ~discussion_thread_id~
-        - id
-        - ~resource_uri~
-        - ~slug~
-        - ~urls~
-        - ~user_role~
+        <h4>Données construites par Ulule</h4>
+        <p>Ces données sont indépendantes du possesseur du projet (l'utilisateur que nous cherchons à conseiller) et <strong>ne seront donc pas utilisées dans cette étude</strong>.</p>
+        <ul>
+            <li><del>absolute_url</del></li>
+            <li><del>discussion_thread_id</del></li>
+            <li>id</li>
+            <li><del>resource_uri</del></li>
+            <li><del>slug</del></li>
+            <li><del>urls</del></li>
+            <li><del>user_role</del></li>
+        </ul>
 
-        L'id du projet sera conservé pour disposer d'une variable indépendante du projet et simple à représenter, en abscisse notamment.
+        <p>L'id du projet sera conservé pour disposer d'une variable indépendante du projet et simple à représenter, en abscisse notamment.</p>
         
-        #### Données obsolètes ou inutiles
-        Ces données proviennent d'anciennes versions de l'API ou sont constantes quelque soit le projet (dans ce data set) et sont donc à retirer.
-        - ~address_required~
-        - ~permissions~
-        - ~phone_number_required~
-        - ~required_personal_id_number~
-        - ~image~
-        - ~status~
-        - ~is_in_extra_time~
+        <h4>Données obsolètes ou inutiles</h4>
+        <p>Ces données proviennent d'anciennes versions de l'API ou sont constantes quelque soit le projet (dans ce data set) et sont donc à retirer.</p>
+        <ul>
+            <li><del>address_required</del></li>
+            <li><del>permissions</del></li>
+            <li><del>phone_number_required</del></li>
+            <li><del>required_personal_id_number</del></li>
+            <li><del>image</del></li>
+            <li><del>status</del></li>
+            <li><del>is_in_extra_time</del></li>
+        </ul>
 
-        #### Données de la campagne
-        Ces données concernent le projet après son lancement.
+        <h4>Données de la campagne</h4>
+        <p>Ces données concernent le projet après son lancement.</p>
+        <ul>
+            <li>amount_raised</li>
+            <li>comments_count</li>
+            <li><del>committed</del></li>
+            <li>date_end</li>
+            <li>date_end_extra_time</li>
+            <li>date_goal_raised</li>
+            <li>date_start</li>
+            <li>fans_count</li>
+            <li><del>finished</del></li>
+            <li><del>is_cancelled</del></li>
+            <li><del>is_in_extra_time</del></li>
+            <li><del>lowest_contribution_amount</del></li>
+            <li>nb_days</li>
+            <li>nb_products_sold</li>
+            <li>news_count</li>
+            <li>orders_count</li>
+            <li>percent</li>
+            <li>sponsorships_count</li>
+            <li>supporters_count</li>
+            <li><del>time_left</del></li>
+            <li><del>time_left_short</del></li>
+        </ul>
+        <p>Afin de ne pas biaiser notre modèle, nous ne nous intéresserons pas aux projets encore en cours. Les variables <strong>time_left</strong>, <strong>time_left_short</strong>, <strong>is_in_extra_time</strong> ainsi que <strong>finished</strong> (après le retrait des projets inachevés) ne sont donc pas pertinentes. De même, les projets annulés doivent être retirés, ainsi que la colonne <strong>is_cancelled</strong>.</p>
+        """
+        string_to_print += set_analysis
 
-        - amount_raised
-        - comments_count
-        - ~committed~
-        - date_end
-        - date_end_extra_time
-        - date_goal_raised
-        - date_start
-        - fans_count
-        - ~finished~
-        - ~is_cancelled~
-        - ~is_in_extra_time~
-        - ~lowest_contribution_amount~
-        - nb_days
-        - nb_products_sold
-        - news_count
-        - orders_count
-        - percent
-        - sponsorships_count
-        - supporters_count
-        - ~time_left~
-        - ~time_left_short~
+        date_end_extra_time_txt = """<h5>date_end_extra_time</h5>
+        <p>La colonne date_end_extra_time sera retirée car aucun projet ayant échoué n'y a fait appel et c'est un phénomène très minoritaire.</p>"""
+        string_to_print += date_end_extra_time_txt
+        string_to_print += date_end_extra_time.show_stats(data)
 
-        Afin de ne pas biaiser notre modèle, nous ne nous intéresserons pas aux projets encore en cours. Les variables <b>time_left</b>, <b>time_left_short</b>, <b>is_in_extra_time</b> ainsi que <b>finished</b> (après le retrait des projets inachevés) ne sont donc pas pertinentes. De même, les projets annulés doivent être retirés, ainsi que la colonne <b>is_cancelled</b>.
-        
-        """)
-        print(set_analysis)
+        lowest_contribution_amount_txt = """<h5>lowest_contribution_amount</h5>
+        <p>Etant quasiment constante, la colonne <strong>lowest_contribution_amount</strong> peut également être retirée car non pertinente.</p>"""
+        string_to_print += lowest_contribution_amount_txt
+        string_to_print += lowest_contribution_amount.show_stats(data)
 
-        date_end_extra_time_txt = markdown.markdown("""##### date_end_extra_time
-        La colonne date_end_extra_time sera retirée car aucun projet ayant échoué n'y a fait appel et c'est un phénomène très minoritaire.""")
-        print(date_end_extra_time_txt)
-        date_end_extra_time.show_stats(data)
+        committed = """<h5>committed</h5>
+        <p>La colonne committed concerne les promesses faites par les supporters. Il y a deux cas de figure :</p>
+        <ul>
+            <li>Le projet est une campagne classique et les supporters promettent de l'argent (<strong>amount_raised</strong>) pour atteindre un objectif (<strong>goal</strong>). Dans ce cas, <strong>committed</strong> est strictement égal à <strong>amount_raised</strong>.</li>
+            <li>Le projet est une prévente, les supporters promettent d'acheter un nombre de produits (<strong>nb_products_sold</strong>) pour atteindre un objectif de vente (<strong>goal</strong>). Dans ce cas, <strong>committed</strong> est strictement égal à <strong>nb_products_sold</strong>.</li>
+        </ul>
 
-        lowest_contribution_amount_txt = markdown.markdown("""##### lowest_contribution_amount
-        Etant quasiment constante, la colonne <b>lowest_contribution_amount</b> peut également être retirée car non pertinente.""")
-        print(lowest_contribution_amount_txt)
-        lowest_contribution_amount.show_stats(data)
+        <p>En conclusion, <strong>committed</strong> peut être retirée car inutile.</p>"""
+        string_to_print += committed
 
-        committed = markdown.markdown("""##### committed
-        La colonne committed concerne les promesses faites par les supporters. Il y a deux cas de figure :
-        - Le projet est une campagne classique et les supporters promettent de l'argent (<b>amount_raised</b>) pour atteindre un objectif (<b>goal</b>). Dans ce cas, <b>committed</b> est strictement égal à <b>amount_raised</b>.
-        - Le projet est une prévente, les supporters promettent d'acheter un nombre de produits (<b>nb_products_sold</b>) pour atteindre un objectif de vente (<b>goal</b>). Dans ce cas, <b>committed</b> est strictement égal à <b>nb_products_sold</b>.
+        project_data = """<h4>Données du projet</h4>
+        <p>Ces données concernent le projet avant son lancement.</p>
+        <ul>
+            <li>analytics_count</li>
+            <li>background</li>
+            <li><del>comments_enabled</del></li>
+            <li><del>country</del></li>
+            <li><del>currency</del></li>
+            <li><del>currency_display</del></li>
+            <li>delivery</li>
+            <li><del>description_ca</del></li>
+            <li><del>description_de</del></li>
+            <li><del>description_en</del></li>
+            <li><del>description_es</del></li>
+            <li>description_fr</li>
+            <li><del>description_it</del></li>
+            <li><del>description_nl</del></li>
+            <li><del>description_pt</del></li>
+            <li><del>description_funding_ca</del></li>
+            <li><del>description_funding_de</del></li>
+            <li><del>description_funding_en</del></li>
+            <li><del>description_funding_es</del></li>
+            <li>description_funding_fr</li>
+            <li><del>description_funding_it</del></li>
+            <li><del>description_funding_nl</del></li>
+            <li><del>description_funding_pt</del></li>
+            <li>goal</li>
+            <li>goal_raised</li>
+            <li>image</li>
+            <li><del>lang</del></li>
+            <li>location</li>
+            <li>main_image</li>
+            <li>main_tag</li>
+            <li><del>name_ca</del></li>
+            <li><del>name_de</del></li>
+            <li><del>name_en</del></li>
+            <li><del>name_es</del></li>
+            <li>name_fr</li>
+            <li><del>name_it</del></li>
+            <li><del>name_nl</del></li>
+            <li><del>name_pt</del></li>
+            <li>owner</li>
+            <li>payment_methods</li>
+            <li>rewards</li>
+            <li>sponsorships_count</li>
+            <li><del>subtitle_ca</del></li>
+            <li><del>subtitle_de</del></li>
+            <li><del>subtitle_en</del></li>
+            <li><del>subtitle_es</del></li>
+            <li>subtitle_fr</li>
+            <li><del>subtitle_it</del></li>
+            <li><del>subtitle_nl</del></li>
+            <li><del>subtitle_pt</del></li>
+            <li>visible</li>
+            <li>video</li>
+            <li>type</li>
+            <li><del>timezone</del></li>
+        </ul>
+        <p>Il ne nous a pas semblé pertinent de garder la colonne <strong>delivery</strong> car elle peut ne pas avoir de sens si le projet n'offre pas de récompense physique (comme un jeu vidéo ou un film).</p>"""
+        string_to_print += project_data
 
-        En conclusion, <b>committed</b> peut être retirée car inutile.""")
-        print(committed)
+        timezone_txt = """<h5>timezone</h5>
+        <p>L'immense majorité des projets a lieu dans la même zone, la colonne <strong>timezone</strong> est quasiment constante, elle peut être retirée.</p>"""
+        string_to_print += timezone_txt
+        string_to_print += timezone.show_stats(data)
 
-        project_data = markdown.markdown("""#### Données du projet
-        Ces données concernent le projet avant son lancement.
+        comments_enabled_txt = """<h5>comments_enabled</h5>
+        <p>Une écrasante majorité des projets autorise les commentaires pour tous les utilisateurs, la colonne <strong>comments_enabled</strong> n'est donc pas pertinente.</p>"""
+        string_to_print += comments_enabled_txt
+        string_to_print += comments_enabled.show_stats(data)
 
-        - analytics_count
-        - background
-        - ~comments_enabled~
-        - ~country~
-        - ~currency~
-        - ~currency_display~
-        - delivery
-        - ~description_ca~
-        - ~description_de~
-        - ~description_en~
-        - ~description_es~
-        - description_fr
-        - ~description_it~
-        - ~description_nl~
-        - ~description_pt~
-        - ~description_funding_ca~
-        - ~description_funding_de~
-        - ~description_funding_en~
-        - ~description_funding_es~
-        - description_funding_fr
-        - ~description_funding_it~
-        - ~description_funding_nl~
-        - ~description_funding_pt~
-        - goal
-        - goal_raised
-        - image
-        - ~lang~
-        - location
-        - main_image
-        - main_tag
-        - ~name_ca~
-        - ~name_de~
-        - ~name_en~
-        - ~name_es~
-        - name_fr
-        - ~name_it~
-        - ~name_nl~
-        - ~name_pt~
-        - owner
-        - payment_methods
-        - rewards
-        - sponsorships_count
-        - ~subtitle_ca~
-        - ~subtitle_de~
-        - ~subtitle_en~
-        - ~subtitle_es~
-        - subtitle_fr
-        - ~subtitle_it~
-        - ~subtitle_nl~
-        - ~subtitle_pt~
-        - visible
-        - video
-        - type
-        - ~timezone~
-        
-        Il ne nous a pas semblé pertinent de garder la colonne <b>delivery</b> car elle peut ne pas avoir de sens si le projet n'offre pas de récompense physique (comme un jeu vidéo ou un film).""")
-        print(project_data)
+        currency_txt = """<h5>currency</h5>
+        <p>L'écrasante majorité des projets est en euro, il est donc possible de retirer la colonne <strong>currency</strong> ainsi que la colonne <strong>currency_display</strong>, sans oublier les projets concernés.</p>"""
+        string_to_print += currency_txt
+        string_to_print += currency.show_stats(data)
 
-        timezone_txt = markdown.markdown("""#####timezone
-        L'immense majorité des projets a lieu dans la même zone, la colonne <b>timezone</b> est quasiment constante, elle peut être retirée.""")
-        print(timezone_txt)
-        timezone.show_stats(data)
-
-        comments_enabled_txt = markdown.markdown("""##### comments_enabled
-        Une écrasante majorité des projets autorise les commentaires pour tous les utilisateurs, la colonne <b>comments_enabled</b> n'est donc pas pertinente.""")
-        print(comments_enabled_txt)
-        comments_enabled.show_stats(data)
-
-        currency_txt = markdown.markdown("""##### currency
-        L'écrasante majorité des projets est en euro, il est donc possible de retirer la colonne <b>currency</b> ainsi que la colonne <b>currency_display</b>, sans oublier les projets concernés.""")
-        print(currency_txt)
-        currency.show_stats(data)
-
-        lang_txt = markdown.markdown("""##### lang
-        Les autres langues que le français étant très minoritaires, on peut retirer tous les projets concernés ainsi que les colonnes suivantes :
-        - <b>description_[Langue!=fr]</b>
-        - <b>description_funding_[Langue!=fr]</b>
-        - <b>lang</b>
-        - <b>name_[Langue!=fr]</b>
-        - <b>subtitle_[Langue!=fr]</b>""")
-        print(lang_txt)
-        lang.show_stats(data)
+        lang_txt = """<h5>lang</h5>
+        <p>Les autres langues que le français étant très minoritaires, on peut retirer tous les projets concernés ainsi que les colonnes suivantes :</p>
+        <ul>
+            <li><strong>description_[Langue!=fr]</strong></li>
+            <li><strong>description_funding_[Langue!=fr]</strong></li>
+            <li><strong>lang</strong></li>
+            <li><strong>name_[Langue!=fr]</strong></li>
+            <li><strong>subtitle_[Langue!=fr]</strong></li>
+        </ul>"""
+        string_to_print += lang_txt
+        string_to_print += lang.show_stats(data)
 
     print("-- Fin de la compréhension")
-    return data
+    return data, string_to_print
