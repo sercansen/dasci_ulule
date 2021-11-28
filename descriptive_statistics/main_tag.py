@@ -14,6 +14,7 @@ def show_stats(data: DataFrame) -> str:
 
     for index, main_tag in zip(data.main_tag.index, data.main_tag):
         goal_was_raised = 1 if data.goal_raised[index] else 0
+
         if main_tag["id"] not in dict_percent_success:
             dict_percent_success[main_tag["id"]] = [1, goal_was_raised]
         else:

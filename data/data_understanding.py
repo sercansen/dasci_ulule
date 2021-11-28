@@ -2,6 +2,7 @@
 
 
 from typing import Tuple
+from data.data_load import load_data
 import pandas as pd
 import data.dropped_features.comments_enabled as comments_enabled
 import data.dropped_features.currency as currency
@@ -11,17 +12,10 @@ import data.dropped_features.lowest_contribution_amount as lowest_contribution_a
 import data.dropped_features.timezone as timezone
 
 
-def _get_dataframe_from_csv() -> pd.DataFrame:
-    """#TODO """
-    df = pd.read_csv("data/ulule_data.csv", low_memory=False)
-    print("-- Fin de la lecture des données")
-    return df
-
-
 def understand_data(display_explanations: bool = False) -> Tuple[pd.DataFrame, str]:
     """#TODO"""
 
-    data = _get_dataframe_from_csv()
+    data = load_data()
 
     string_to_print = """"""
 

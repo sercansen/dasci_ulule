@@ -3,33 +3,14 @@
 
 import numpy as np
 import ast
-from descriptive_statistics.amount_raised import show_stats as amount_raised_show_stats
-from descriptive_statistics.analytics_count import show_stats as analytics_count_show_stats
-from descriptive_statistics.background import show_stats as background_show_stats
-from descriptive_statistics.comments_count import show_stats as comments_count_show_stats
-from descriptive_statistics.common_stats import show_stats as common_stats_show_stats
-from descriptive_statistics.fans_count import show_stats as fans_count_show_stats
-from descriptive_statistics.goal_raised import show_stats as goal_raised_show_stats
-from descriptive_statistics.goal import show_stats as goal_show_stats
-from descriptive_statistics.main_tag import show_stats as main_tag_show_stats
-from descriptive_statistics.nb_days import show_stats as nb_days_show_stats
-from descriptive_statistics.news_count import show_stats as news_count_show_stats
-from descriptive_statistics.owner import show_stats as owner_show_stats
-from descriptive_statistics.payment_methods import show_stats as payment_methods_show_stats
-from descriptive_statistics.percent import show_stats as percent_show_stats
-from descriptive_statistics.post_covid import show_stats as post_covid_show_stats
-from descriptive_statistics.rewards import show_stats as rewards_show_stats
-from descriptive_statistics.sponsorships_count import show_stats as sponsorships_count_show_stats
-from descriptive_statistics.supporters_count import show_stats as supporters_count_show_stats
-from descriptive_statistics.video import show_stats as video_show_stats
-from descriptive_statistics.visible import show_stats as visible_show_stats
+import os
 from typing import Tuple
 from pandas import DataFrame
 from datetime import datetime
 from data.data_understanding import understand_data
 
 
-def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, str]:
+def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFrame, DataFrame, str]:
     """#TODO"""
     data, string_to_print = understand_data(
         display_explanations=display_explanations)
@@ -134,6 +115,18 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, str]:
 
     data.background = data.background.apply(binarize)
     data.video = data.video.apply(binarize)
+
+    # Location
+    if display_explanations:
+        location = "<h5>La colonne location contient un dictionnaire avec plusieurs attributs. On choisit de ne garder que la ville.</h5>"
+        string_to_print += location
+
+    def recup_in_str_location(x):
+        if type(x) == str:
+            return ast.literal_eval(x)['city']
+        else:
+            return None
+    data['location'] = data['location'].apply(recup_in_str_location)
 
     # Owner
     if display_explanations:
@@ -253,26 +246,29 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, str]:
         string_to_print += """<h5>nb_products_sold</h5><p>Retrait de la colonne <strong>nb_product_sold</strong> pour les projets n'étant pas sous la forme d'une prévente, car cette colonne est équivalente à la colonne <strong>supporters_count</strong>.</p>"""
     data.drop(columns="nb_products_sold", inplace=True)
 
-    string_to_print += amount_raised_show_stats(data)
-    string_to_print += analytics_count_show_stats(data)
-    string_to_print += background_show_stats(data)
-    string_to_print += comments_count_show_stats(data)
-    string_to_print += fans_count_show_stats(data)
-    string_to_print += goal_raised_show_stats(data)
-    string_to_print += goal_show_stats(data)
-    string_to_print += main_tag_show_stats(data)
-    string_to_print += nb_days_show_stats(data)
-    string_to_print += news_count_show_stats(data)
-    string_to_print += owner_show_stats(data)
-    string_to_print += payment_methods_show_stats(data)
-    string_to_print += percent_show_stats(data)
-    string_to_print += post_covid_show_stats(data)
-    string_to_print += rewards_show_stats(data)
-    string_to_print += sponsorships_count_show_stats(data)
-    string_to_print += supporters_count_show_stats(data)
-    string_to_print += video_show_stats(data)
-    string_to_print += visible_show_stats(data)
-    string_to_print += common_stats_show_stats(data)
+    # Génération d'un CSV propre
+    data_pre_covid, data_post_covid = generate_clean_data(data)
 
     print("-- Fin de la préparation")
-    return data, string_to_print
+    return data, data_pre_covid, data_post_covid, string_to_print
+
+
+def generate_clean_data(data: DataFrame) -> Tuple[DataFrame, DataFrame]:
+    """#TODO"""
+
+    data_post_covid = data[data.post_covid == True].drop(
+        columns=['post_covid'])
+    data_pre_covid = data[data.post_covid == False].drop(
+        columns=['post_covid'])
+
+    # Génération d'un CSV propre
+    if not os.path.isfile("./data/clean_data.csv"):
+        data.to_csv('./data/clean_data.csv')
+    if not os.path.isfile("./data/clean_data_post_covid.csv"):
+        data_post_covid.to_csv('./data/clean_data_post_covid.csv')
+    if not os.path.isfile("./data/clean_data_pre_covid.csv"):
+        data_pre_covid.to_csv('./data/clean_data_pre_covid.csv')
+
+    print("-- Fin de la génération des données nettoyées")
+
+    return data_pre_covid, data_post_covid
