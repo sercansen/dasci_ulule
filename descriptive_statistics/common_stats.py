@@ -52,13 +52,13 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
     components_pre_cov = pca_pre_cov.components_
     components_post_cov = pca_post_cov.components_
 
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=[10, 22])
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=[20, 10])
     circle1 = plt.Circle((0, 0), 1, fill=False)
     circle2 = plt.Circle((0, 0), 1, fill=False)
 
     for i, (x, y) in enumerate(zip(components_pre_cov[0, :], components_pre_cov[1, :])):
-        ax1.plot([0, x], [0, y], color='k')
-        ax1.text(x, y, pre_covid_df.columns[i])
+        ax1.plot([0, x], [0, y], color='b')
+        ax1.text(x, y, pre_covid_df.columns[i], color='b')
 
     ax1.plot([-0.7, 0.7], [0, 0], color='grey', ls='--')
     ax1.plot([0, 0], [-0.7, 0.7], color='grey', ls='--')
@@ -67,13 +67,34 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
         'Correlation circle for numerical features before March 2020')
 
     for i, (x, y) in enumerate(zip(components_post_cov[0, :], components_post_cov[1, :])):
-        ax2.plot([0, x], [0, y], color='k')
-        ax2.text(x, y, post_covid_df.columns[i])
+        ax2.plot([0, x], [0, y], color='r')
+        ax2.text(x, y, post_covid_df.columns[i], color='r')
 
     ax2.plot([-0.7, 0.7], [0, 0], color='grey', ls='--')
     ax2.plot([0, 0], [-0.7, 0.7], color='grey', ls='--')
     ax2.add_patch(circle2)
     ax2.set_title('Correlation circle for numerical features after March 2020')
+
+    to_string += get_html_from_fig(fig)
+    plt.close(fig)
+
+    fig, ax = plt.subplots(figsize=[20, 20])
+    circle1 = plt.Circle((0, 0), 1, fill=False)
+    circle2 = plt.Circle((0, 0), 1, fill=False)
+
+    for i, (x, y) in enumerate(zip(components_pre_cov[0, :], components_pre_cov[1, :])):
+        ax.plot([0, x], [0, y], color='b')
+        ax.text(x, y, pre_covid_df.columns[i], color='b')
+
+    ax.plot([-0.7, 0.7], [0, 0], color='grey', ls='--')
+    ax.plot([0, 0], [-0.7, 0.7], color='grey', ls='--')
+    ax.add_patch(circle1)
+    ax.set_title(
+        'Correlation circle for numerical features before (blue) and after (red) March 2020')
+
+    for i, (x, y) in enumerate(zip(components_post_cov[0, :], components_post_cov[1, :])):
+        ax.plot([0, x], [0, y], color='r')
+        ax.text(x, y, post_covid_df.columns[i], color='r')
 
     to_string += get_html_from_fig(fig)
     plt.close(fig)
