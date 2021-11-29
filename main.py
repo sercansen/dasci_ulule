@@ -49,14 +49,16 @@ Une vérification du set sera effectuée afin de ne pas traiter de données pers
         data_post_covid = load_post_covid_data()
         print("-- Fin du chargement des données")
     else:
+        print("-- Début de la préparation des données")
         data, data_pre_covid, data_post_covid, new_string = prepare_data(
             display_explanations=display_explanations)
         string_to_print += new_string
+        print("-- Fin de la préparation des données")
 
     # Affichage des statistiques descriptives
     if display_explanations:
         string_to_print += show_stats(data, data_pre_covid,
-                                      data_post_covid, string_to_print)
+                                      data_post_covid)
 
     # Génération du pdf de sortie
     pdfkit.from_string(string_to_print, './out.pdf',

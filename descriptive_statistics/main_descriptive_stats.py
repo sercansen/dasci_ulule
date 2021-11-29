@@ -23,7 +23,8 @@ from descriptive_statistics.video import show_stats as video_show_stats
 from descriptive_statistics.visible import show_stats as visible_show_stats
 
 
-def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: DataFrame, string_to_print: str) -> str:
+def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: DataFrame) -> str:
+    string_to_print = ""
     string_to_print += "<h2>Statistiques descriptives</h2>"
     string_to_print += amount_raised_show_stats(data)
     string_to_print += analytics_count_show_stats(data)

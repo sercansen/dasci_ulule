@@ -47,7 +47,9 @@ def load_clean_data() -> DataFrame:
         Les données chargées.
     """
 
-    return _update_data_frame(read_csv("./data/clean_data.csv"))
+    df = read_csv("./data/clean_data.csv")
+    _update_data_frame(df)
+    return df
 
 
 def load_pre_covid_data() -> DataFrame:
@@ -63,7 +65,9 @@ def load_pre_covid_data() -> DataFrame:
         Les données chargées.
     """
 
-    return _update_data_frame(read_csv("./data/clean_data_pre_covid.csv"))
+    df = read_csv("./data/clean_data_pre_covid.csv")
+    _update_data_frame(df)
+    return df
 
 
 def load_post_covid_data() -> DataFrame:
@@ -78,8 +82,9 @@ def load_post_covid_data() -> DataFrame:
     df : DataFrame
         Les données chargées.
     """
-
-    return _update_data_frame(read_csv("./data/clean_data_post_covid.csv"))
+    df = read_csv("./data/clean_data_post_covid.csv")
+    _update_data_frame(df)
+    return df
 
 
 def _update_data_frame(data_frame: DataFrame) -> None:
@@ -94,4 +99,15 @@ def _update_data_frame(data_frame: DataFrame) -> None:
     def update_col_main_tag(x):
         if type(x["main_tag"]) == str:
             return ast.literal_eval(x["main_tag"])
+
+    def update_col_owner(x):
+        if type(x["owner"]) == str:
+            return ast.literal_eval(x["owner"])
+
+    def update_col_rewards(x):
+        if type(x["rewards"]) == str:
+            return ast.literal_eval(x["rewards"])
+
     data_frame["main_tag"] = data_frame.apply(update_col_main_tag, axis=1)
+    data_frame["owner"] = data_frame.apply(update_col_owner, axis=1)
+    data_frame["rewards"] = data_frame.apply(update_col_rewards, axis=1)
