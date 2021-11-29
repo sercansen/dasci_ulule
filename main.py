@@ -1,3 +1,12 @@
+"""
+Point d'entrée du programme, charge le ou les CSV, lance les stats.
+
+Fonctions
+----------
+main
+    S'occupe du chargement des CSV, des stats et de la génération du pdf
+"""
+
 from descriptive_statistics.main_descriptive_stats import show_stats
 from data.data_preparation import prepare_data
 from data.data_load import load_clean_data, load_post_covid_data, load_pre_covid_data
@@ -6,6 +15,20 @@ import pdfkit
 
 
 def main(display_explanations=False) -> None:
+    """
+    Fonction chargée de déclencher l'appel aux différentes sous-programmes.>
+
+    La fonction est chargée entre autres de charger les fichiers CSV,
+    d'afficher les stats descriptives, et de générer le pdf de sortie.
+
+    Paramètres
+    -------- 
+    display_explanations : bool, optionnel
+        Indique au programme s'il doit afficher les explications de ce qui est
+        fait dans le pdf de sortie ou non (utile pour accélérer le programme
+        lors d'un débuggage).
+    """
+
     string_to_print = """<meta http-equiv="Content-type" content="text/html; charset=utf-8" />"""
 
     # Introduction

@@ -1,4 +1,13 @@
-"""#TODO"""
+"""
+Préparation des données : retrait des lignes et colonnes inutiles ciblées.
+
+Fonctions
+----------
+prepare_data
+    Retire les lignes et colonnes inutiles, transforme les variables etc.
+generate_clean_data
+    Exporte les données traitées au format .CSV
+"""
 
 
 import numpy as np
@@ -11,7 +20,31 @@ from data.data_understanding import understand_data
 
 
 def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFrame, DataFrame, str]:
-    """#TODO"""
+    """
+    Prépare les données pour l'étude à venir.
+
+    Retire les colonnes inutiles, les projets ne répondant pas à certains
+    critères (ne pas avoir de case vide dans certaines colonnes, ...) ou
+    transforme certaines colonnes.
+
+    Paramètres
+    -------- 
+    display_explanations : bool, optionnel
+        Détermine s'il faut afficher les explications sur ce qui est fait
+        (utile en cas de débuggage).
+
+    Valeurs retournées
+    -------- 
+    data : DataFrame
+        Les données nettoyées.
+    data_pre_covid : DataFrame
+        Les données nettoyées concernant les projets pré-covid.
+    data_post_covid : DataFrame
+        Les données nettoyées concernant les projets post-covid.
+    string_to_print : str
+        La chaîne de caractère contenant les affichages.
+    """
+
     data, string_to_print = understand_data(
         display_explanations=display_explanations)
 
@@ -205,12 +238,17 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
     data['nb_days'] = [days_between(
         data.date_start[k][0:10], data.date_end[k][0:10]) for k in data.date_start.index]
 
+    # news_per_days
     if display_explanations:
         string_to_print += "<h5>news_per_days</h5><p>Création de la colonne news_per_days</p>"
     col = (data["news_count"]/data["nb_days"]
            ).apply(lambda x: 0 if np.isnan(x) or np.isinf(x) else x)
     data["news_per_days"] = col
+    zero_day_projects = data[data["nb_days"] == 0]
+    # on enlève les projets ayant duré moins de 24h, il y en a 9 dont un seul financé
+    data.drop(index=zero_day_projects.index, inplace=True)
 
+    # nb_rewards
     if display_explanations:
         string_to_print += "<h5>nb_rewards</h5><p>Création de la colonne nb_rewards</p>"
 
@@ -254,7 +292,25 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
 
 
 def generate_clean_data(data: DataFrame) -> Tuple[DataFrame, DataFrame]:
-    """#TODO"""
+    """
+    Extrait les données concernant les projets pré et post covid, génère des .CSV.
+
+    La fonction sépare les données d'un dataframe en deux sous dataframe, selon
+    la date du projet (si le projet est pré ou post covid). Les trois dataframe,
+    en comptant l'original, sont exportés au format .CSV.
+
+    Paramètres
+    -------- 
+    data : DataFrame
+        Le dataframe contenant les données à séparer.
+
+    Valeurs retournées
+    -------- 
+    data_pre_covid : DataFrame
+        Les données des projets pre-covid.
+    data_post_covid : DataFrame
+        Les données des projets post-covid.
+"""
 
     data_post_covid = data[data.post_covid == True].drop(
         columns=['post_covid'])

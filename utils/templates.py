@@ -21,13 +21,14 @@ Fonctions
 Paramètres
 -------- 
 <nom du paramètre 1> : <type du paramètre 1>, optionnel (si le paramètre 1 est optionnel)
-<Description rapide du paramètre 1>
+    <Description rapide du paramètre 1>
 <nom du paramètre 2> : <type du paramètre 2>, optionnel (si le paramètre 2 est optionnel)
-<Description rapide du paramètre 2>
+    <Description rapide du paramètre 2>
+
 Valeurs retournées
 -------- 
 <nom de la valeur 1> : <type de la valeur 1>
-<Description rapide de la valeur 1>
+    <Description rapide de la valeur 1>
 <nom de la valeur 2> : <type de la valeur 2>
-<Description rapide de la valeur 2>
+    <Description rapide de la valeur 2>
 """

@@ -1,4 +1,11 @@
-"""#TODO"""
+"""
+Lance la phase de compréhension des données, en affichant du texte.
+
+Fonctions
+----------
+understand_data
+    Affiche le texte rédigé pour la compréhension des données, après leur import.
+"""
 
 
 from typing import Tuple
@@ -13,7 +20,27 @@ import data.dropped_features.timezone as timezone
 
 
 def understand_data(display_explanations: bool = False) -> Tuple[pd.DataFrame, str]:
-    """#TODO"""
+    """
+    Affiche le texte décrivant étape par étape la compréhension des données.
+
+    Chacune des features non nécessaire du dataframe est retirée après
+    vérification. Par exemple si 99% ds projets ont la même valeur pour cette
+    feature, il n'est pas intéressant de la garder. L'affichage de statistiques
+    est également pris en charge par cette fonction.
+
+    Paramètres
+    -------- 
+    display_explanations : bool, optionnel
+        Détermine s'il faut ou non afficher les explications du travail effectué.
+        Utile en cas de débuggage, pour accélérer le programme.
+
+    Valeurs retournées
+    -------- 
+    data : DataFrame
+        Les données extraites et légérement traitées (retrait de doublons par exemple)
+    string_to_print : str
+        La chaîne de caractère à laquelle le texte est ajouté.
+"""
 
     data = load_data()
 
