@@ -255,7 +255,7 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
     def get_nb_rewards(index_project):
         nb = 0
         for dictionnary in data.rewards[index_project]:
-            nb += len(dictionnary.keys())
+            nb += len(data.rewards[index_project])
         return nb
 
     list_nb_reward = [get_nb_rewards(k) for k in data.rewards.index]

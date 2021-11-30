@@ -29,5 +29,5 @@ def show_stats(data: DataFrame) -> str:
     to_print += "<p>{}</p>".format(
         spearmanr(data['goal_raised'], data['news_per_days']))
     to_print += "<p>{}</p>".format("""Un certain nombre de projets ne donne aucune nouvelle durant la campagne, la grande majorité n'en donne pas plus de cinq durant toute la campagne. La grande majorité des projets ne donne qu'une news tous les dix jours, au mieux.
-Il semble y avoir une légère corrélation entre le nombre de news par jour et le succès de la campagne.""")
+Il semble que les campagnes qui ont le plus de succès fournisse plus de news par jour que les autres.""")
     return to_print

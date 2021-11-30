@@ -22,7 +22,7 @@ def show_stats(data: DataFrame) -> None:
 
     to_print += "<p>{}</p>".format(
         spearmanr(data['goal_raised'], data['nb_rewards']))
-    to_print += "<p>{}</p>".format("""???""")
+    to_print += "<p>{}</p>".format("""Une majorité de projets ont entre 0 et 50 tiers de rewards. Les projets réussis ont une moyenne de nombre de tiers légèrement plus élevée que les projets ratés, mais cela ne semble pas réellement discriminer entre succès et échec d'un projet.""")
 
     to_print += "<p>{}</p>".format("""On appellera dans ce qui suit "meilleure récompense", la récompense maximisant le rapport de son prix sur le nombre d'achat. Ainsi une récompense vendue une seule fois à 500€ est meilleure qu'une récompense vendue 100 fois à 2€.""")
 

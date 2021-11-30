@@ -24,5 +24,5 @@ def show_stats(data: DataFrame) -> str:
     to_string += "<p>{}</p>".format(
         spearmanr(data['goal_raised'], data['comments_count']))
     to_string += "<p>{}</p>".format("""Les projets reçoivent globalement assez peu de commentaires. La plupart des projets qui ont beaucoup de commentaires, ont bien fonctionné.
-Il semble y avoir une petite corrélation entre le nombre de commentaires et le succès de la campagne.""")
+Il y a une corrélation entre le nombre de commentaires et le succès de la campagne; il semble que plus on en parle, plus elle soit susceptible de réussir, même si ce facteur ne semble pas être déterminant.""")
     return to_string

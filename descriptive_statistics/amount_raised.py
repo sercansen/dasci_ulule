@@ -24,5 +24,5 @@ def show_stats(data: DataFrame) -> str:
         spearmanr(data['goal_raised'], data['amount_raised']))
 
     to_print += "<p>{}</p>".format("""Les projets semblent assez homogènes dans les montants levés même si moins nombreux pour les plus hauts montants.
-Il semble y avoir une bonne corrélation entre le montant obtenu et le succès de la campagne (peu surprenant).""")
+Le coefficient de corrélation est assez élevé entre le montant obtenu et le succès de la campagne; plus une campagne lève de dons, plus elle est susceptible d'aboutir.""")
     return to_print
