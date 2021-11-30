@@ -31,7 +31,7 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
     to_string += get_html_from_fig(fig)
     plt.close(fig)
 
-    to_string += "<p>{}</p>".format("""???""")
+    to_string += "<p>{}</p>".format("""On explore les corrélations entre les différentes variables numériques du dataset. Le montant récolté est assez logiquement fortement corrélé aux nombres de fans, de supporter et de commentaires. Il semble également que mettre des news sur un projet soit une des façons de susciter des commentaires.""")
 
     to_string += "<h5>PCA</h5>"
 
@@ -77,6 +77,8 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
 
     to_string += get_html_from_fig(fig)
     plt.close(fig)
+    to_string += "<p>{}</p>".format("""La PCA est une autre façon de représenter les corrélations entre nos différentes variables. Avant Mars 2020 (date que l'on considère dans notre cas comme date d'impact du covid sur Ulule), le nombre de fans, de supporters, de commmentaires ainsi que le montant récolté étaient moins corrélés entre eux qu'à partir de Mars 2020, ce qui témoigne d'un aspect communautaire plus important avec le covid.""")
+
 
     fig, ax = plt.subplots(figsize=[20, 20])
     circle1 = plt.Circle((0, 0), 1, fill=False)
