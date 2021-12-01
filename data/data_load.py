@@ -11,6 +11,8 @@ load_pre_covid_data
     Charge les données nettoyées et pré-covid
 load_post_covid_data
     Charge les données nettoyées et post-covid
+load_categorical_data
+    Charge les données pour une catégorie
 _update_data_frame
     Retransforme les chaînes de caractères en dictionnaires
 """
@@ -86,6 +88,22 @@ def load_post_covid_data() -> DataFrame:
     _update_data_frame(df)
     return df
 
+def load_categorical_data(file_name) -> DataFrame:
+    """
+    Charge les données depuis le CSV contenant une donnée catégorielle.
+
+    La fonction retransforme les données comme les chaînes de caractère
+    en dictionnaires.
+
+    Valeurs retournées
+    -------- 
+    df : DataFrame
+        Les données chargées.
+    """
+
+    df = read_csv(file_name)
+    _update_data_frame(df)
+    return df
 
 def _update_data_frame(data_frame: DataFrame) -> None:
     """

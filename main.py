@@ -9,7 +9,7 @@ main
 
 from descriptive_statistics.main_descriptive_stats import show_stats
 from data.data_preparation import prepare_data
-from data.data_load import load_clean_data, load_post_covid_data, load_pre_covid_data
+from data.data_load import load_clean_data, load_post_covid_data, load_pre_covid_data, load_categorical_data
 import os
 import pdfkit
 
@@ -28,6 +28,48 @@ def main(display_explanations=False) -> None:
         fait dans le pdf de sortie ou non (utile pour accélérer le programme
         lors d'un débuggage).
     """
+    print("Souhaitez-vous faire l'analyse de toutes les données (entrez 'tout') ou seulement d'une catégorie (entrez 'cat') ?")
+    x= input()
+    print("Vous avez choisi ", x)
+    y= 0
+
+    if x == 'cat':
+        tags_possibles = ["Solidaire & Citoyen",
+"Santé & Bien-être",
+"Artisanat & Cuisine",
+"Art & Photo",
+"Edition & Journal.",
+"BD",
+"Autres projets",
+"Musique",
+"Mode & Design",
+"Film et vidéo",
+"Jeux",
+"Spectacle vivant",
+"Sports",
+"Technologie",
+"Patrimoine",
+"Enfance & Educ."]
+
+        print("Entrer le main_tag parmi les suivants : (pour l'analyse de toutes les données, tapez 'tout')")
+        for tag in tags_possibles: 
+            print(tag, end="  ")
+
+        y= input()
+        if y in tags_possibles :
+            print("Vous avez choisi ", y)
+
+            file_name= "data_cat_covid/data_"+ y + "/clean_data_"+ y +".csv"
+            file_name_pre_covid= "data_cat_covid/data_"+ y + "/pre_covid_data_"+ y +".csv"
+            file_name_post_covid= "data_cat_covid/data_"+ y + "/post_covid_data_"+ y +".csv"
+
+        elif y == 'tout':
+            print("Vous avez choisi ", y)
+
+        else:
+            return("Erreur")
+
+
 
     string_to_print = """<meta http-equiv="Content-type" content="text/html; charset=utf-8" />"""
 
@@ -41,19 +83,28 @@ def main(display_explanations=False) -> None:
 Une vérification du set sera effectuée afin de ne pas traiter de données personnelles.</p>"""
 
     # Chargement des données
-    if os.path.isfile("./data/clean_data.csv"):
+    if x == 'tout' or y == 'tout':
+        if os.path.isfile("./data/clean_data.csv"):
+            print("-- Début du chargement des données nettoyées")
+            string_to_print += "<h2>Chargement des données du CSV pré-nettoyé</h2>"
+            data = load_clean_data()
+            data_pre_covid = load_pre_covid_data()
+            data_post_covid = load_post_covid_data()
+            print("-- Fin du chargement des données")
+        else:
+            print("-- Début de la préparation des données")
+            data, data_pre_covid, data_post_covid, new_string = prepare_data(
+                display_explanations=display_explanations)
+            string_to_print += new_string
+            print("-- Fin de la préparation des données")
+
+    else:
         print("-- Début du chargement des données nettoyées")
         string_to_print += "<h2>Chargement des données du CSV pré-nettoyé</h2>"
-        data = load_clean_data()
-        data_pre_covid = load_pre_covid_data()
-        data_post_covid = load_post_covid_data()
-        print("-- Fin du chargement des données")
-    else:
-        print("-- Début de la préparation des données")
-        data, data_pre_covid, data_post_covid, new_string = prepare_data(
-            display_explanations=display_explanations)
-        string_to_print += new_string
-        print("-- Fin de la préparation des données")
+        data = load_categorical_data(file_name)
+        data_pre_covid = load_categorical_data(file_name_pre_covid)
+        data_post_covid = load_categorical_data(file_name_post_covid)
+        print("-- Fin du chargement des données")       
 
     # Affichage des statistiques descriptives
     if display_explanations:
