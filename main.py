@@ -4,7 +4,7 @@ Point d'entrée du programme, charge le ou les CSV, lance les stats.
 Fonctions
 ----------
 main
-    S'occupe du chargement des CSV, des stats et de la génération du pdf
+    S'occupe du chargement des CSV, des stats et de la génération du pdf.
 """
 
 from descriptive_statistics.main_descriptive_stats import show_stats
@@ -29,47 +29,48 @@ def main(display_explanations=False) -> None:
         lors d'un débuggage).
     """
     print("Souhaitez-vous faire l'analyse de toutes les données (entrez 'tout') ou seulement d'une catégorie (entrez 'cat') ?")
-    x= input()
+    x = input()
     print("Vous avez choisi ", x)
-    y= 0
+    y = 0
 
     if x == 'cat':
         tags_possibles = ["Solidaire & Citoyen",
-"Santé & Bien-être",
-"Artisanat & Cuisine",
-"Art & Photo",
-"Edition & Journal.",
-"BD",
-"Autres projets",
-"Musique",
-"Mode & Design",
-"Film et vidéo",
-"Jeux",
-"Spectacle vivant",
-"Sports",
-"Technologie",
-"Patrimoine",
-"Enfance & Educ."]
+                          "Santé & Bien-être",
+                          "Artisanat & Cuisine",
+                          "Art & Photo",
+                          "Edition & Journal.",
+                          "BD",
+                          "Autres projets",
+                          "Musique",
+                          "Mode & Design",
+                          "Film et vidéo",
+                          "Jeux",
+                          "Spectacle vivant",
+                          "Sports",
+                          "Technologie",
+                          "Patrimoine",
+                          "Enfance & Educ."]
 
         print("Entrer le main_tag parmi les suivants : (pour l'analyse de toutes les données, tapez 'tout')")
-        for tag in tags_possibles: 
+        for tag in tags_possibles:
             print(tag, end="  ")
-
-        y= input()
-        if y in tags_possibles :
+        print("\n")
+        y = input()
+        if y in tags_possibles:
             print("Vous avez choisi ", y)
 
-            file_name= "data_cat_covid/data_"+ y + "/clean_data_"+ y +".csv"
-            file_name_pre_covid= "data_cat_covid/data_"+ y + "/pre_covid_data_"+ y +".csv"
-            file_name_post_covid= "data_cat_covid/data_"+ y + "/post_covid_data_"+ y +".csv"
+            file_name = "data_cat_covid/data_" + y + "/clean_data_" + y + ".csv"
+            file_name_pre_covid = "data_cat_covid/data_" + \
+                y + "/pre_covid_data_" + y + ".csv"
+            file_name_post_covid = "data_cat_covid/data_" + \
+                y + "/post_covid_data_" + y + ".csv"
 
         elif y == 'tout':
             print("Vous avez choisi ", y)
 
         else:
-            return("Erreur")
-
-
+            print("Erreur")
+            return
 
     string_to_print = """<meta http-equiv="Content-type" content="text/html; charset=utf-8" />"""
 
@@ -104,12 +105,12 @@ Une vérification du set sera effectuée afin de ne pas traiter de données pers
         data = load_categorical_data(file_name)
         data_pre_covid = load_categorical_data(file_name_pre_covid)
         data_post_covid = load_categorical_data(file_name_post_covid)
-        print("-- Fin du chargement des données")       
+        print("-- Fin du chargement des données")
 
     # Affichage des statistiques descriptives
     if display_explanations:
         string_to_print += show_stats(data, data_pre_covid,
-                                      data_post_covid)
+                                      data_post_covid, not (x == 'tout' or y == 'tout'))
 
     # Génération du pdf de sortie
     pdfkit.from_string(string_to_print, './out.pdf',

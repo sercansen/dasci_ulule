@@ -10,7 +10,7 @@ from sklearn.decomposition import PCA
 from utils.utils import get_html_from_fig
 
 
-def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: DataFrame) -> str:
+def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: DataFrame, are_stats_cat: bool) -> str:
     """#TODO"""
 
     to_string = "<h4>Autres stats ? NOMMER CA AUTREMENT SVP</h4>"
@@ -43,6 +43,9 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
     post_covid_df.drop(columns=['id', 'date_end', 'date_goal_raised', 'date_start', 'description_fr', 'description_funding_fr', 'description_yourself_fr',
                        'goal_raised', 'location', 'main_tag', 'name_fr', 'owner', 'payment_methods', 'rewards', 'subtitle_fr', 'visible'], inplace=True)
 
+    if are_stats_cat:
+        pre_covid_df.drop(columns=['main_tag_name_fr'], inplace=True)
+        post_covid_df.drop(columns=['main_tag_name_fr'], inplace=True)
     x_pre_covid_scaled = StandardScaler().fit_transform(pre_covid_df.values)
     x_post_covid_scaled = StandardScaler().fit_transform(post_covid_df.values)
 
@@ -78,7 +81,6 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
     to_string += get_html_from_fig(fig)
     plt.close(fig)
     to_string += "<p>{}</p>".format("""La PCA est une autre façon de représenter les corrélations entre nos différentes variables. Avant Mars 2020 (date que l'on considère dans notre cas comme date d'impact du covid sur Ulule), le nombre de fans, de supporters, de commmentaires ainsi que le montant récolté étaient moins corrélés entre eux qu'à partir de Mars 2020, ce qui témoigne d'un aspect communautaire plus important avec le covid.""")
-
 
     fig, ax = plt.subplots(figsize=[20, 20])
     circle1 = plt.Circle((0, 0), 1, fill=False)
