@@ -59,10 +59,10 @@ def main(display_explanations=False) -> None:
         if y in tags_possibles:
             print("Vous avez choisi ", y)
 
-            file_name = "data_cat_covid/data_" + y + "/clean_data_" + y + ".csv"
-            file_name_pre_covid = "data_cat_covid/data_" + \
+            file_name = "data/data_cat_covid/data_" + y + "/clean_data_" + y + ".csv"
+            file_name_pre_covid = "data/data_cat_covid/data_" + \
                 y + "/pre_covid_data_" + y + ".csv"
-            file_name_post_covid = "data_cat_covid/data_" + \
+            file_name_post_covid = "data/data_cat_covid/data_" + \
                 y + "/post_covid_data_" + y + ".csv"
 
         elif y == 'tout':
