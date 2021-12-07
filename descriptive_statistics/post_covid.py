@@ -17,12 +17,12 @@ def show_stats(data: DataFrame) -> str:
     plt.close(fig)
 
     fig = plt.figure(edgecolor="b")
-    sns.regplot(x="sponsorships_count", y="goal_raised", data=data)
+    sns.regplot(x="post_covid", y="goal_raised", data=data)
     to_print += get_html_from_fig(fig)
     plt.close(fig)
 
     to_print += "<p>" + str(spearmanr(data['goal_raised'],
-                                      data['sponsorships_count'])) + "</p>"
+                                      data['post_covid'])) + "</p>"
 
     to_print += """<p>L'obtention de sponsors semble être un phénomène très minoritaire. Il ne semble pas y avoir de corrélation entre le succès de la campagne et la présence de sponsors.</p>"""
     return to_print

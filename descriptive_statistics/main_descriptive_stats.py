@@ -25,6 +25,7 @@ from descriptive_statistics.visible import show_stats as visible_show_stats
 
 def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: DataFrame, are_stats_cat: bool) -> str:
     """#TODO : doc"""
+    print("-- Début des statistiques descriptives")
     string_to_print = ""
     string_to_print += "<h2>Statistiques descriptives</h2>"
     string_to_print += amount_raised_show_stats(data)
@@ -48,4 +49,5 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
     string_to_print += visible_show_stats(data)
     string_to_print += common_stats_show_stats(
         data, data_pre_covid, data_post_covid, are_stats_cat)
+    print("-- Fin des stats descriptives")
     return string_to_print
