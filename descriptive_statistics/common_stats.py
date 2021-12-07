@@ -10,7 +10,7 @@ from sklearn.decomposition import PCA
 from utils.utils import get_html_from_fig
 
 
-def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: DataFrame, are_stats_cat: bool) -> str:
+def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: DataFrame, data_general: DataFrame, are_stats_cat: bool) -> str:
     """#TODO"""
 
     to_string = "<h4>Autres stats ? NOMMER CA AUTREMENT SVP</h4>"
@@ -28,6 +28,12 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
 
     plot_corr(corr_df.corr())
 
+    to_string += get_html_from_fig(fig)
+    plt.close(fig)
+
+    fig = plt.figure(2)
+    corr_df_general = data_general.drop(columns=['id', 'type', 'background', 'date_goal_raised', 'date_start', 'description_fr', 'description_funding_fr', 'description_yourself_fr', 'goal_raised', 'location', 'main_tag', 'name_fr', 'owner', 'payment_methods', 'rewards', 'subtitle_fr', 'video', 'visible'], inplace=False)
+    plot_corr(corr_df_general.corr().subtract(corr_df.corr()))
     to_string += get_html_from_fig(fig)
     plt.close(fig)
 

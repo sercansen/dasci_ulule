@@ -105,12 +105,13 @@ Une vérification du set sera effectuée afin de ne pas traiter de données pers
         data = load_categorical_data(file_name)
         data_pre_covid = load_categorical_data(file_name_pre_covid)
         data_post_covid = load_categorical_data(file_name_post_covid)
+        data_general = load_clean_data()
         print("-- Fin du chargement des données")
 
     # Affichage des statistiques descriptives
     if display_explanations:
         string_to_print += show_stats(data, data_pre_covid,
-                                      data_post_covid, not (x == 'tout' or y == 'tout'))
+                                      data_post_covid, data_general, not (x == 'tout' or y == 'tout'))
 
     # Génération du pdf de sortie
     pdfkit.from_string(string_to_print, './out.pdf',
