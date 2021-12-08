@@ -384,6 +384,7 @@ def generate_clean_data_cat(data: DataFrame, cat: str) -> Tuple[DataFrame,DataFr
     os.makedirs('data/data_cat_covid', exist_ok=True)
 
     dir_name ="data/data_cat_covid/data_"+str(cat)
+    os.makedirs(dir_name, exist_ok=True)
 
     file_name= dir_name + "/clean_data_"+ str(cat) +".csv"
     file_name_pre_covid= dir_name + "/pre_covid_data_"+str(cat)+".csv"
