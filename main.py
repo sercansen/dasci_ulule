@@ -28,6 +28,7 @@ def main(display_explanations=False) -> None:
         fait dans le pdf de sortie ou non (utile pour accélérer le programme
         lors d'un débuggage).
     """
+
     print("Souhaitez-vous faire l'analyse de toutes les données (entrez 'tout') ou seulement d'une catégorie (entrez 'cat') ?")
     x = input()
     print("Vous avez choisi ", x)
@@ -85,6 +86,7 @@ Une vérification du set sera effectuée afin de ne pas traiter de données pers
 
     # Chargement des données
     if x == 'tout' or y == 'tout':
+        output_name = "tout"
         if os.path.isfile("./data/clean_data.csv"):
             print("-- Début du chargement des données nettoyées")
             string_to_print += "<h2>Chargement des données du CSV pré-nettoyé</h2>"
@@ -102,6 +104,7 @@ Une vérification du set sera effectuée afin de ne pas traiter de données pers
             print("-- Fin de la préparation des données")
 
     else:
+        output_name = y
         print("-- Début du chargement des données nettoyées")
         string_to_print += "<h2>Chargement des données du CSV pré-nettoyé</h2>"
         data = load_categorical_data(file_name)
@@ -116,7 +119,25 @@ Une vérification du set sera effectuée afin de ne pas traiter de données pers
                                       data_post_covid, data_general, not (x == 'tout' or y == 'tout'))
 
     # Génération du pdf de sortie
-    pdfkit.from_string(string_to_print, './out.pdf',
+    pdfkit_safe_name = {"tout": "tout",
+                        "Solidaire & Citoyen": "solidaire_citoyen",
+                        "Santé & Bien-être": "sante_bien_etre",
+                        "Artisanat & Cuisine": "artisanat_cuisine",
+                        "Art & Photo": "art_photo",
+                        "Edition & Journal.": "edition_journal",
+                        "BD": "bd",
+                        "Autres projets": "autres",
+                        "Musique": "musique",
+                        "Mode & Design": "mode_design",
+                        "Film et vidéo": "film_video",
+                        "Jeux": "jeux",
+                        "Spectacle vivant": "spectacle",
+                        "Sports": "sports",
+                        "Technologie": "technologie",
+                        "Patrimoine": "patrimoine",
+                        "Enfance & Educ.": "enfance_educ"}
+    output_file_name = "out/" + pdfkit_safe_name[output_name] + ".pdf"
+    pdfkit.from_string(string_to_print, output_path=output_file_name,
                        css="./styles/styles.css")
     print("-- Fin de la génération du pdf")
 
