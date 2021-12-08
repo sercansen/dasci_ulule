@@ -104,7 +104,7 @@ def understand_data(display_explanations: bool = False) -> Tuple[pd.DataFrame, s
             <li><del>committed</del></li>
             <li>date_end</li>
             <li>date_end_extra_time</li>
-            <li>date_goal_raised</li>
+            <li><del>date_goal_raised</del></li>
             <li>date_start</li>
             <li>fans_count</li>
             <li><del>finished</del></li>
@@ -124,6 +124,9 @@ def understand_data(display_explanations: bool = False) -> Tuple[pd.DataFrame, s
         <p>Afin de ne pas biaiser notre modèle, nous ne nous intéresserons pas aux projets encore en cours. Les variables <strong>time_left</strong>, <strong>time_left_short</strong>, <strong>is_in_extra_time</strong> ainsi que <strong>finished</strong> (après le retrait des projets inachevés) ne sont donc pas pertinentes. De même, les projets annulés doivent être retirés, ainsi que la colonne <strong>is_cancelled</strong>.</p>
         """
         string_to_print += set_analysis
+
+        goal_raised = "<h5>date_goal_raised</h5><p>La colonne <strong>date_goal_raised</strong> est incompatible avec notre problématique : conseiller les lanceurs de projets pour qu'ils réussissent leur projet. Elle est donc retirée.</p>"
+        string_to_print += goal_raised
 
         string_to_print += date_end_extra_time.show_stats(data)
 

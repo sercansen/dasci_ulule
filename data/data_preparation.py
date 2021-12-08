@@ -74,6 +74,7 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
                        'currency',
                        'currency_display',
                        'date_end_extra_time',
+                       'date_goal_raised',
                        'delivery',
                        'description_ca',
                        'description_de',
@@ -205,6 +206,20 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
     if display_explanations:
         string_to_print += "</ul>"
 
+    # nb_rewards
+    if display_explanations:
+        string_to_print += "<h5>nb_rewards</h5><p>Création de la colonne nb_rewards.</p>"
+
+    def get_nb_rewards(index_project):
+        nb = 0
+        for _ in data.rewards[index_project]:
+            nb += len(data.rewards[index_project])
+        return nb
+
+    list_nb_reward = [get_nb_rewards(k) for k in data.rewards.index]
+    data["nb_rewards"] = list_nb_reward
+    data.drop(columns=["rewards"], inplace=True)
+
     # nb_days
     if display_explanations:
         nb_days = """<h5>nb_days</h5><p>La colonne "nb_days" contient un tiers de valeurs vides, il faut la compléter.</p>"""
@@ -220,26 +235,13 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
 
     # news_per_days
     if display_explanations:
-        string_to_print += "<h5>news_per_days</h5><p>Création de la colonne news_per_days</p>"
+        string_to_print += "<h5>news_per_days</h5><p>Création de la colonne news_per_days.</p>"
     col = (data["news_count"]/data["nb_days"]
            ).apply(lambda x: 0 if np.isnan(x) or np.isinf(x) else x)
     data["news_per_days"] = col
     zero_day_projects = data[data["nb_days"] == 0]
     # on enlève les projets ayant duré moins de 24h, il y en a 9 dont un seul financé
     data.drop(index=zero_day_projects.index, inplace=True)
-
-    # nb_rewards
-    if display_explanations:
-        string_to_print += "<h5>nb_rewards</h5><p>Création de la colonne nb_rewards</p>"
-
-    def get_nb_rewards(index_project):
-        nb = 0
-        for _ in data.rewards[index_project]:
-            nb += len(data.rewards[index_project])
-        return nb
-
-    list_nb_reward = [get_nb_rewards(k) for k in data.rewards.index]
-    data["nb_rewards"] = list_nb_reward
 
     # pre-post Covid
     if display_explanations:
@@ -254,7 +256,7 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
 
     # date
     if display_explanations:
-        date = """<h5>date_*</h5><>Il n'est plus utile de conserver les dates de début et de fin si on dispose des colonnes nb_days et post_covid. Retirons les.</p>"""
+        date = """<h5>date_*</h5><p>Il n'est plus utile de conserver les dates de début et de fin si on dispose des colonnes nb_days et post_covid. Retirons les.</p>"""
         string_to_print += date
     data.drop(columns=['date_start', 'date_end'], inplace=True)
 

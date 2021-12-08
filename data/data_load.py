@@ -120,9 +120,4 @@ def _update_data_frame(data_frame: DataFrame) -> None:
         if type(x["main_tag"]) == str:
             return ast.literal_eval(x["main_tag"])
 
-    def update_col_rewards(x):
-        if type(x["rewards"]) == str:
-            return ast.literal_eval(x["rewards"])
-
     data_frame["main_tag"] = data_frame.apply(update_col_main_tag, axis=1)
-    data_frame["rewards"] = data_frame.apply(update_col_rewards, axis=1)
