@@ -17,6 +17,7 @@ from typing import Tuple
 from pandas import DataFrame
 from datetime import datetime
 from data.data_understanding import understand_data
+from bs4 import BeautifulSoup
 
 
 def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFrame, DataFrame, str]:
@@ -224,6 +225,30 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
         data.drop(labels=index_with_nan, inplace=True)
     if display_explanations:
         string_to_print += "</ul>"
+
+    #Donnes textuelles
+    summary_donnees_txt = """<p>Afin de traiter les données textuelles comme la description du projet, la description de l'auteur du projet ainsi que le titre et le sous-titre du projet, nous gardons seulement la longueur, le nombre de points d'exclamation et le nombre de points d'interrogations dans ces données</p>"""
+    if display_explanations:
+    	string_to_print += summary_donnees_txt   
+
+    def clean_text(x):
+    	return BeautifulSoup(x, "lxml").text
+    def nb_exclamation(x):
+    	return x.count('!')
+    def nb_interogation(x):
+    	return x.count('?')
+    def prep_text(feature):
+    	data['clean_'+feature] = data[feature].apply(clean_text)
+    	data['len_'+feature] = data['clean_'+feature].apply(len)
+    	data['nb_exclamation_'+feature]=data['clean_'+feature].apply(nb_exclamation)
+    	data['nb_interogation_'+feature]=data['clean_'+feature].apply(nb_interogation)
+    	data.drop(columns=[feature, 'clean_'+feature], inplace=True)
+
+    prep_text('description_fr')
+    prep_text('description_funding_fr')
+    prep_text('description_yourself_fr')
+    prep_text('name_fr')
+    prep_text('subtitle_fr')
 
     # nb_days
     if display_explanations:
