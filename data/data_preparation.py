@@ -254,7 +254,7 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
 
     def get_nb_rewards(index_project):
         nb = 0
-        for dictionnary in data.rewards[index_project]:
+        for _ in data.rewards[index_project]:
             nb += len(data.rewards[index_project])
         return nb
 
@@ -271,6 +271,12 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
         return datetime.strptime(x[:10], '%Y-%m-%d') > date_covid
 
     data['post_covid'] = data['date_end'].apply(post_covid)
+
+    # date
+    if display_explanations:
+        date = """<h5>date_*</h5><>Il n'est plus utile de conserver les dates de début et de fin si on dispose des colonnes nb_days et post_covid. Retirons les.</p>"""
+        string_to_print += date
+    data.drop(columns=['date_start', 'date_end'], inplace=True)
 
     # type
     if display_explanations:

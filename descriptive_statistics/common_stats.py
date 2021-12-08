@@ -17,7 +17,7 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
 
     to_string += "<h5>Matrice de corrélation</h5>"
     corr_df = data.copy(deep=True)
-    corr_df.drop(columns=['id', 'type', 'background', 'date_goal_raised', 'date_start', 'description_fr', 'description_funding_fr', 'description_yourself_fr',
+    corr_df.drop(columns=['id', 'type', 'background', 'date_goal_raised', 'description_fr', 'description_funding_fr', 'description_yourself_fr',
                  'goal_raised', 'location', 'main_tag', 'name_fr', 'owner', 'payment_methods', 'rewards', 'subtitle_fr', 'video', 'visible'], inplace=True)
     fig = plt.figure(1)
     plt.matshow(corr_df.corr(), 1)
@@ -32,7 +32,8 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
     plt.close(fig)
 
     fig = plt.figure(2)
-    corr_df_general = data_general.drop(columns=['id', 'type', 'background', 'date_goal_raised', 'date_start', 'description_fr', 'description_funding_fr', 'description_yourself_fr', 'goal_raised', 'location', 'main_tag', 'name_fr', 'owner', 'payment_methods', 'rewards', 'subtitle_fr', 'video', 'visible'], inplace=False)
+    corr_df_general = data_general.drop(columns=['id', 'type', 'background', 'date_goal_raised', 'description_fr', 'description_funding_fr', 'description_yourself_fr',
+                                        'goal_raised', 'location', 'main_tag', 'name_fr', 'owner', 'payment_methods', 'rewards', 'subtitle_fr', 'video', 'visible'], inplace=False)
     plot_corr(corr_df_general.corr().subtract(corr_df.corr()))
     to_string += get_html_from_fig(fig)
     plt.close(fig)
@@ -44,11 +45,10 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
     pre_covid_df = data_pre_covid.copy(deep=True)
     post_covid_df = data_post_covid.copy(deep=True)
 
-    pre_covid_df.drop(columns=['id', 'date_end', 'date_goal_raised', 'date_start', 'description_fr', 'description_funding_fr', 'description_yourself_fr',
+    pre_covid_df.drop(columns=['id', 'date_goal_raised', 'description_fr', 'description_funding_fr', 'description_yourself_fr',
                       'goal_raised', 'location', 'main_tag', 'name_fr', 'owner', 'payment_methods', 'rewards', 'subtitle_fr', 'visible'], inplace=True)
-    post_covid_df.drop(columns=['id', 'date_end', 'date_goal_raised', 'date_start', 'description_fr', 'description_funding_fr', 'description_yourself_fr',
+    post_covid_df.drop(columns=['id', 'date_goal_raised', 'description_fr', 'description_funding_fr', 'description_yourself_fr',
                        'goal_raised', 'location', 'main_tag', 'name_fr', 'owner', 'payment_methods', 'rewards', 'subtitle_fr', 'visible'], inplace=True)
-
 
     if are_stats_cat:
         if 'main_tag_name_fr' in pre_covid_df.columns:
