@@ -114,6 +114,7 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
                        'name_it',
                        'name_nl',
                        'name_pt',
+                       'payment_methods',
                        'orders_count',
                        'owner',
                        'required_personal_id_number',

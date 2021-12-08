@@ -16,10 +16,11 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
     to_string = "<h4>Autres stats ? NOMMER CA AUTREMENT SVP</h4>"
 
     to_string += "<h5>Matrice de corrélation</h5>"
-    data = data.set_index('Unnamed: 0')
+
     corr_df = data.copy(deep=True)
     corr_df.drop(columns=['id', 'type', 'background',
-                 'goal_raised', 'main_tag', 'payment_methods', 'video', 'visible'], inplace=True)
+                 'goal_raised', 'main_tag', 'video', 'visible'], inplace=True)
+    corr_df = corr_df.set_index('Unnamed: 0')
     fig = plt.figure(1)
     plt.matshow(corr_df.corr(), 1)
 
@@ -34,7 +35,7 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
 
     fig = plt.figure(2)
     corr_df_general = data_general.drop(columns=['id', 'type', 'background',
-                                        'goal_raised', 'main_tag', 'payment_methods', 'video', 'visible'], inplace=False)
+                                        'goal_raised', 'main_tag', 'video', 'visible'], inplace=False)
     plot_corr(corr_df_general.corr().subtract(corr_df.corr()))
     to_string += get_html_from_fig(fig)
     plt.close(fig)
@@ -47,16 +48,16 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
     post_covid_df = data_post_covid.copy(deep=True)
 
     pre_covid_df.drop(columns=['id',
-                      'goal_raised', 'main_tag', 'payment_methods', 'visible'], inplace=True)
+                      'goal_raised', 'main_tag', 'visible'], inplace=True)
     post_covid_df.drop(columns=['id',
-                       'goal_raised', 'main_tag', 'payment_methods', 'visible'], inplace=True)
+                       'goal_raised', 'main_tag', 'visible'], inplace=True)
 
     if are_stats_cat:
         if 'main_tag_name_fr' in pre_covid_df.columns:
             pre_covid_df.drop(columns=['main_tag_name_fr'], inplace=True)
         if 'main_tag_name_fr' in post_covid_df.columns:
             post_covid_df.drop(columns=['main_tag_name_fr'], inplace=True)
-    print(pre_covid_df.columns)
+
     x_pre_covid_scaled = StandardScaler().fit_transform(pre_covid_df.values)
     x_post_covid_scaled = StandardScaler().fit_transform(post_covid_df.values)
 

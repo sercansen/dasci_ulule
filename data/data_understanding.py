@@ -184,7 +184,7 @@ def understand_data(display_explanations: bool = False) -> Tuple[pd.DataFrame, s
             <li><del>name_nl</del></li>
             <li><del>name_pt</del></li>
             <li>owner</li>
-            <li>payment_methods</li>
+            <li><del>payment_methods</del></li>
             <li>rewards</li>
             <li>sponsorships_count</li>
             <li><del>subtitle_ca</del></li>
@@ -208,6 +208,9 @@ def understand_data(display_explanations: bool = False) -> Tuple[pd.DataFrame, s
 
         owner = "<h5>owner</h5><p>La colonne <strong>owner</strong> est inutilisable en tant que telle car seules les stats <strong>anonymisées et concernant l'activité publique de lancement de projet</strong> de l'owner nous intéressent.</p><p>De plus, les stats des owners ne peuvent être utilisées : par exemple si un owner a lancé 44 projets, alors pour <strong>chaque</strong> projet, le nombre 44 apparaitra, faisant grossir artificiellement les chiffres. La colonne est donc retirée.</p>"
         string_to_print += owner
+
+        payment_methods = "<h5>payment_methods</h5><p>La gestion des moyens de paiements ne nous a pas semblé pertinente. Colonne retirée.</p>"
+        string_to_print += payment_methods
 
         string_to_print += timezone.show_stats(data)
 
