@@ -21,7 +21,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 
-def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, str]:
+def prepare_data(cat: str = None, display_explanations: bool = False) -> Tuple[DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, str]:
     """
     Prépare les données pour l'étude à venir.
     Retire les colonnes inutiles, les projets ne répondant pas à certains
@@ -144,7 +144,6 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
 
     print("--- Fin de la suppression des colonnes")
 
-
     # Transformations de données
     # Binarisation
     summary_transformation = """<p>Certaines colonnes doivent être binarisée pour représenter ou non la présence d'un objet (comme une vidéo). Binarisation de <strong>video</strong> et <strong>background</strong></p>"""
@@ -189,14 +188,14 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
 
     def recup_in_str_main_tag(x):
         if type(x["main_tag"]) == str:
-            return {key:val for key, val in ast.literal_eval(x["main_tag"]).items() if key == 'name_fr' or key == 'id'}
-        
+            return {key: val for key, val in ast.literal_eval(x["main_tag"]).items() if key == 'name_fr' or key == 'id'}
 
     def recup_in_str_main_tag_name_fr(x):
         if type(x["main_tag"]) == str:
-            return {key:val for key, val in ast.literal_eval(x["main_tag"]).items() if key == 'name_fr' or key == 'id'}['name_fr']
+            return {key: val for key, val in ast.literal_eval(x["main_tag"]).items() if key == 'name_fr' or key == 'id'}['name_fr']
 
-    data["main_tag_name_fr"] = data.apply(recup_in_str_main_tag_name_fr, axis=1)
+    data["main_tag_name_fr"] = data.apply(
+        recup_in_str_main_tag_name_fr, axis=1)
     data["main_tag"] = data.apply(recup_in_str_main_tag, axis=1)
 
     print("--- Fin de la première étape de transformation")
@@ -223,11 +222,11 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
 
     if display_explanations:
         string_to_print += "<p>OneHotEncoding des main-tag</p><ul>"
-    data = pd.concat([data,pd.get_dummies(data['main_tag_name_fr'])],axis=1)
-    data.drop(columns=['main_tag_name_fr',"main_tag"], inplace=True)
+    data = pd.concat([data, pd.get_dummies(data['main_tag_name_fr'])], axis=1)
+    data.drop(columns=['main_tag_name_fr', "main_tag"], inplace=True)
 
     print("--- Début du traitement des données textuelles (c'est long)")
-    #Donnes textuelles
+    # Donnes textuelles
     # nb_rewards
     if display_explanations:
         string_to_print += "<h5>nb_rewards</h5><p>Création de la colonne nb_rewards.</p>"
@@ -329,8 +328,9 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
     data_pre_covid, data_post_covid = generate_clean_data(data)
 
     if cat is not None:
-        data_cat, data_cat_pre_covid, data_cat_post_covid = generate_clean_data_cat(data, cat)
-    else :
+        data_cat, data_cat_pre_covid, data_cat_post_covid = generate_clean_data_cat(
+            data, cat)
+    else:
         data_cat, data_cat_pre_covid, data_cat_post_covid = None, None, None
 
     print("-- Fin de la préparation")
@@ -362,7 +362,6 @@ def generate_clean_data(data: DataFrame) -> Tuple[DataFrame, DataFrame]:
         columns=['post_covid'])
     data_pre_covid = data[data.post_covid == False].drop(
         columns=['post_covid'])
-        
 
     # Génération d'un CSV propre
     if not os.path.isfile("./data/clean_data.csv"):
@@ -376,28 +375,26 @@ def generate_clean_data(data: DataFrame) -> Tuple[DataFrame, DataFrame]:
 
     return data_pre_covid, data_post_covid
 
-def generate_clean_data_cat(data: DataFrame, cat: str) -> Tuple[DataFrame,DataFrame,DataFrame]:
+
+def generate_clean_data_cat(data: DataFrame, cat: str) -> Tuple[DataFrame, DataFrame, DataFrame]:
     data_cat = data.loc[data[cat] == 1]
 
     data_cat_pre_covid, data_cat_post_covid = generate_clean_data(data_cat)
 
     os.makedirs('data/data_cat_covid', exist_ok=True)
 
-    dir_name ="data/data_cat_covid/data_"+str(cat)
+    dir_name = "data/data_cat_covid/data_"+str(cat)
     os.makedirs(dir_name, exist_ok=True)
 
-    file_name= dir_name + "/clean_data_"+ str(cat) +".csv"
-    file_name_pre_covid= dir_name + "/pre_covid_data_"+str(cat)+".csv"
-    file_name_post_covid= dir_name + "/post_covid_data_"+str(cat)+".csv"
+    file_name = dir_name + "/clean_data_" + str(cat) + ".csv"
+    file_name_pre_covid = dir_name + "/pre_covid_data_"+str(cat)+".csv"
+    file_name_post_covid = dir_name + "/post_covid_data_"+str(cat)+".csv"
 
     if not os.path.isfile(file_name):
         data_cat.to_csv(file_name)
     if not os.path.isfile(file_name_pre_covid):
-        data_cat.to_csv(file_name_pre_covid)
+        data_cat_pre_covid.to_csv(file_name_pre_covid)
     if not os.path.isfile(file_name_post_covid):
-        data_cat.to_csv(file_name_post_covid)
-    
-    print("-- Fin de la génération des données catégorielles nettoyées")
+        data_cat_post_covid.to_csv(file_name_post_covid)
 
     return data_cat, data_cat_pre_covid, data_cat_post_covid
-

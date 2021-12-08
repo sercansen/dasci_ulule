@@ -13,40 +13,39 @@ from utils.utils import get_html_from_fig
 def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: DataFrame, data_general: DataFrame, are_stats_cat: bool) -> str:
     """#TODO"""
 
-    
-    
-
     to_string = "<h4>Autres stats ? NOMMER CA AUTREMENT SVP</h4>"
 
     to_string += "<h5>Matrice de corrélation</h5>"
 
     corr_df = data.copy(deep=True)
 
-    if data.equals(data_general):
+    if are_stats_cat:
         corr_df.drop(columns=["Solidaire & Citoyen",
-                          "Santé & Bien-être",
-                          "Artisanat & Cuisine",
-                          "Art & Photo",
-                          "Edition & Journal.",
-                          "BD",
-                          "Autres projets",
-                          "Musique",
-                          "Mode & Design",
-                          "Film et vidéo",
-                          "Jeux",
-                          "Spectacle vivant",
-                          "Sports",
-                          "Technologie",
-                          "Patrimoine",
-                          "Enfance & Educ."], inplace=True)
+                              "Santé & Bien-être",
+                              "Artisanat & Cuisine",
+                              "Art & Photo",
+                              "Edition & Journal.",
+                              "BD",
+                              "Autres projets",
+                              "Musique",
+                              "Mode & Design",
+                              "Film et vidéo",
+                              "Jeux",
+                              "Spectacle vivant",
+                              "Sports",
+                              "Technologie",
+                              "Patrimoine",
+                              "Enfance & Educ."], inplace=True)
     corr_df.drop(columns=['id', 'type', 'background',
                  'goal_raised', 'video', 'visible'], inplace=True)
-    corr_df = corr_df.set_index('Unnamed: 0')
-    fig = plt.figure(1)
+
+    if 'Unnamed: 0' in corr_df.columns:
+        corr_df = corr_df.set_index('Unnamed: 0')
+    fig = plt.figure(num=1, figsize=[30, 30])
     plt.matshow(corr_df.corr(), 1)
 
     def plot_corr(corr):
-        plt.rc('figure', figsize=[15, 20])
+        plt.rc('figure', figsize=[30, 30])
         sns.heatmap(corr, annot=True, linewidth=0.5, square=True)
 
     plot_corr(corr_df.corr())
@@ -54,36 +53,39 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
     to_string += get_html_from_fig(fig)
     plt.close(fig)
 
-    fig = plt.figure(2)
+    fig = plt.figure()
     corr_df_general = data_general.drop(columns=[
-                        "Solidaire & Citoyen",
-                          "Santé & Bien-être",
-                          "Artisanat & Cuisine",
-                          "Art & Photo",
-                          "Edition & Journal.",
-                          "BD",
-                          "Autres projets",
-                          "Musique",
-                          "Mode & Design",
-                          "Film et vidéo",
-                          "Jeux",
-                          "Spectacle vivant",
-                          "Sports",
-                          "Technologie",
-                          "Patrimoine",
-                          "Enfance & Educ."], inplace=False)
-    subtract = corr_df_general.corr().subtract(corr_df.corr())
-    plot_corr(subtract)
-
-    corr_df_general = data_general.drop(columns=['id', 'type', 'background',
-                                        'goal_raised', 'video', 'visible'], inplace=False)
+        "Solidaire & Citoyen",
+        "Santé & Bien-être",
+        "Artisanat & Cuisine",
+        "Art & Photo",
+        "Edition & Journal.",
+        "BD",
+        "Autres projets",
+        "Musique",
+        "Mode & Design",
+        "Film et vidéo",
+        "Jeux",
+        "Spectacle vivant",
+        "Sports",
+        "Technologie",
+        "Patrimoine",
+        "Enfance & Educ.",
+        'id', 'type', 'background', 'goal_raised', 'video', 'visible'], inplace=False)
+    if 'Unnamed: 0' in corr_df_general.columns:
+        corr_df_general = corr_df_general.set_index('Unnamed: 0')
     plot_corr(corr_df_general.corr().subtract(corr_df.corr()))
     to_string += get_html_from_fig(fig)
     plt.close(fig)
 
     to_string += "<p>{}</p>".format("""On explore les corrélations entre les différentes variables numériques du dataset. Le montant récolté est assez logiquement fortement corrélé aux nombres de fans, de supporter et de commentaires. Il semble également que mettre des news sur un projet soit une des façons de susciter des commentaires.""")
 
-    to_string += "<h5>PCA</h5>"
+    to_string += draw_pca(data_pre_covid, data_post_covid)
+    return to_string
+
+
+def draw_pca(data_pre_covid, data_post_covid):
+    to_string = "<h5>PCA</h5>"
 
     pre_covid_df = data_pre_covid.copy(deep=True)
     post_covid_df = data_post_covid.copy(deep=True)
