@@ -35,7 +35,6 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
     string_to_print += fans_count_show_stats(data)
     string_to_print += goal_raised_show_stats(data)
     string_to_print += goal_show_stats(data)
-    string_to_print += main_tag_show_stats(data)
     string_to_print += nb_days_show_stats(data)
     string_to_print += news_count_show_stats(data)
     string_to_print += owner_show_stats(data)
@@ -48,6 +47,6 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
     string_to_print += video_show_stats(data)
     string_to_print += visible_show_stats(data)
     string_to_print += common_stats_show_stats(
-        data, data_pre_covid, data_general, data_post_covid, are_stats_cat)
+        data, data_pre_covid, data_post_covid, data_general, are_stats_cat)
     print("-- Fin des stats descriptives")
     return string_to_print

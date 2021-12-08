@@ -114,6 +114,7 @@ Une vérification du set sera effectuée afin de ne pas traiter de données pers
         print("-- Fin du chargement des données")
 
     # Affichage des statistiques descriptives
+
     if display_explanations:
         string_to_print += show_stats(data, data_pre_covid,
                                       data_post_covid, data_general, not (x == 'tout' or y == 'tout'))

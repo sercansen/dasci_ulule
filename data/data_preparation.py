@@ -17,12 +17,12 @@ from typing import Tuple
 from pandas import DataFrame
 from datetime import datetime
 from data.data_understanding import understand_data
+import pandas as pd
 
 
-def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFrame, DataFrame, str]:
+def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, str]:
     """
     Prépare les données pour l'étude à venir.
-
     Retire les colonnes inutiles, les projets ne répondant pas à certains
     critères (ne pas avoir de case vide dans certaines colonnes, ...) ou
     transforme certaines colonnes.
@@ -203,9 +203,17 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
 
     def recup_in_str_main_tag(x):
         if type(x["main_tag"]) == str:
-            return {key: val for key, val in ast.literal_eval(x["main_tag"]).items() if key == 'name_fr' or key == 'id'}
+            return {key:val for key, val in ast.literal_eval(x["main_tag"]).items() if key == 'name_fr' or key == 'id'}
+        
 
+    def recup_in_str_main_tag_name_fr(x):
+        if type(x["main_tag"]) == str:
+            return {key:val for key, val in ast.literal_eval(x["main_tag"]).items() if key == 'name_fr' or key == 'id'}['name_fr']
+
+    data["main_tag_name_fr"] = data.apply(recup_in_str_main_tag_name_fr, axis=1)
     data["main_tag"] = data.apply(recup_in_str_main_tag, axis=1)
+
+
 
     # Retrait de lignes incomplètes
     essentials_columns_names = ['date_start', 'date_end', 'amount_raised', 'comments_count', 'date_start', 'date_end', 'description_fr',
@@ -224,6 +232,13 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
         data.drop(labels=index_with_nan, inplace=True)
     if display_explanations:
         string_to_print += "</ul>"
+
+    if display_explanations:
+        string_to_print += "<p>OneHotEncoding des main-tag</p><ul>"
+    data = pd.concat([data,pd.get_dummies(data['main_tag_name_fr'])],axis=1)
+    data.drop(columns=['main_tag_name_fr',"main_tag"], inplace=True)
+
+    
 
     # nb_days
     if display_explanations:
@@ -287,8 +302,13 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
     # Génération d'un CSV propre
     data_pre_covid, data_post_covid = generate_clean_data(data)
 
+    if cat is not None:
+        data_cat, data_cat_pre_covid, data_cat_post_covid = generate_clean_data_cat(data, cat)
+    else :
+        data_cat, data_cat_pre_covid, data_cat_post_covid = None, None, None
+
     print("-- Fin de la préparation")
-    return data, data_pre_covid, data_post_covid, string_to_print
+    return data, data_pre_covid, data_post_covid, string_to_print, data_cat, data_cat_pre_covid, data_cat_post_covid
 
 
 def generate_clean_data(data: DataFrame) -> Tuple[DataFrame, DataFrame]:
@@ -316,6 +336,7 @@ def generate_clean_data(data: DataFrame) -> Tuple[DataFrame, DataFrame]:
         columns=['post_covid'])
     data_pre_covid = data[data.post_covid == False].drop(
         columns=['post_covid'])
+        
 
     # Génération d'un CSV propre
     if not os.path.isfile("./data/clean_data.csv"):
@@ -328,3 +349,24 @@ def generate_clean_data(data: DataFrame) -> Tuple[DataFrame, DataFrame]:
     print("-- Fin de la génération des données nettoyées")
 
     return data_pre_covid, data_post_covid
+
+def generate_clean_data_cat(data: DataFrame, cat: str) -> Tuple[DataFrame,DataFrame,DataFrame]:
+    data_cat = df.loc[df[cat] == 1]
+
+    data_cat_pre_covid, data_cat_post_covid = generate_clean_data(data_cat)
+
+    file_name= dir_name + "./data/data_cat_covid/clean_data_"+ str(cat) +".csv"
+    file_name_pre_covid= dir_name + "./data/data_cat_covid/pre_covid_data_"+str(cat)+".csv"
+    file_name_post_covid= dir_name + "./data/data_cat_covid/post_covid_data_"+str(cat)+".csv"
+
+    if not os.path.isfile(file_name):
+        data_cat.to_csv(file_name)
+    if not os.path.isfile(file_name_pre_covid):
+        data_cat.to_csv(file_name_pre_covid)
+    if not os.path.isfile(file_name_post_covid):
+        data_cat.to_csv(file_name_post_covid)
+    
+    print("-- Fin de la génération des données catégorielles nettoyées")
+
+    return data_cat, data_cat_pre_covid, data_cat_post_covid
+

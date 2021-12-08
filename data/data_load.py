@@ -103,6 +103,7 @@ def load_categorical_data(file_name) -> DataFrame:
 
     df = read_csv(file_name)
     _update_data_frame(df)
+    df.drop(columns=['main_tag_name_fr',"main_tag"], inplace=True)
     return df
 
 def _update_data_frame(data_frame: DataFrame) -> None:
@@ -114,9 +115,9 @@ def _update_data_frame(data_frame: DataFrame) -> None:
     data_frame : DataFrame
         Le data frame contenant les données à actualiser.
     """
-    def update_col_main_tag(x):
-        if type(x["main_tag"]) == str:
-            return ast.literal_eval(x["main_tag"])
+    # def update_col_main_tag(x):
+    #     if type(x["main_tag"]) == str:
+    #         return ast.literal_eval(x["main_tag"])
 
     def update_col_owner(x):
         if type(x["owner"]) == str:
@@ -126,6 +127,6 @@ def _update_data_frame(data_frame: DataFrame) -> None:
         if type(x["rewards"]) == str:
             return ast.literal_eval(x["rewards"])
 
-    data_frame["main_tag"] = data_frame.apply(update_col_main_tag, axis=1)
+    # data_frame["main_tag"] = data_frame.apply(update_col_main_tag, axis=1)
     data_frame["owner"] = data_frame.apply(update_col_owner, axis=1)
     data_frame["rewards"] = data_frame.apply(update_col_rewards, axis=1)
