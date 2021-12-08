@@ -49,9 +49,12 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
     post_covid_df.drop(columns=['id', 'date_end', 'date_goal_raised', 'date_start', 'description_fr', 'description_funding_fr', 'description_yourself_fr',
                        'goal_raised', 'location', 'main_tag', 'name_fr', 'owner', 'payment_methods', 'rewards', 'subtitle_fr', 'visible'], inplace=True)
 
+
     if are_stats_cat:
-        pre_covid_df.drop(columns=['main_tag_name_fr'], inplace=True)
-        post_covid_df.drop(columns=['main_tag_name_fr'], inplace=True)
+        if 'main_tag_name_fr' in pre_covid_df.columns:
+            pre_covid_df.drop(columns=['main_tag_name_fr'], inplace=True)
+        if 'main_tag_name_fr' in post_covid_df.columns:
+            post_covid_df.drop(columns=['main_tag_name_fr'], inplace=True)
     x_pre_covid_scaled = StandardScaler().fit_transform(pre_covid_df.values)
     x_post_covid_scaled = StandardScaler().fit_transform(post_covid_df.values)
 
