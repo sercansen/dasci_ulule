@@ -103,6 +103,7 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
                        'is_in_extra_time',
                        'finished',
                        'lang',
+                       'location',
                        'lowest_contribution_amount',
                        'main_image',
                        'name_ca',
@@ -113,6 +114,7 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
                        'name_nl',
                        'name_pt',
                        'orders_count',
+                       'owner',
                        'required_personal_id_number',
                        'resource_uri',
                        'sharing_urls',
@@ -149,28 +151,6 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
 
     data.background = data.background.apply(binarize)
     data.video = data.video.apply(binarize)
-
-    # Location
-    if display_explanations:
-        location = "<h5>La colonne location contient un dictionnaire avec plusieurs attributs. On choisit de ne garder que la ville.</h5>"
-        string_to_print += location
-
-    def recup_in_str_location(x):
-        if type(x) == str:
-            return ast.literal_eval(x)['city']
-        else:
-            return None
-    data['location'] = data['location'].apply(recup_in_str_location)
-
-    # Owner
-    if display_explanations:
-        owner = "<h5>owner</h5><p>La colonne <strong>owner</strong> est inutilisable en tant que telle car seules les stats <strong>anonymisées et concernant l'activité publique de lancement de projet</strong> de l'owner nous intéressent.</p>"
-        string_to_print += owner
-
-    def recup_in_str_owner(x):
-        return ast.literal_eval(x['owner'])['stats']
-
-    data['owner'] = data.apply(recup_in_str_owner, axis=1)
 
     # Rewards
     if display_explanations:
@@ -211,7 +191,7 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
     # Retrait de lignes incomplètes
     essentials_columns_names = ['date_start', 'date_end', 'amount_raised', 'comments_count', 'date_start', 'date_end', 'description_fr',
                                 'description_funding_fr', 'description_yourself_fr', 'fans_count',
-                                'goal', 'goal_raised', 'id', 'main_tag', 'name_fr', 'news_count', 'owner', 'percent',
+                                'goal', 'goal_raised', 'id', 'main_tag', 'name_fr', 'news_count', 'percent',
                                 'rewards', 'sponsorships_count', 'subtitle_fr', 'supporters_count']
 
     if display_explanations:
