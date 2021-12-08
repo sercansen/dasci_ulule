@@ -18,6 +18,7 @@ from pandas import DataFrame
 from datetime import datetime
 from data.data_understanding import understand_data
 import pandas as pd
+from bs4 import BeautifulSoup
 
 
 def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, str]:
@@ -102,6 +103,7 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
                        'is_in_extra_time',
                        'finished',
                        'lang',
+                       'location',
                        'lowest_contribution_amount',
                        'main_image',
                        'name_ca',
@@ -112,6 +114,7 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
                        'name_nl',
                        'name_pt',
                        'orders_count',
+                       'owner',
                        'required_personal_id_number',
                        'resource_uri',
                        'sharing_urls',
@@ -137,6 +140,9 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
         string_to_print += summary
         string_to_print += "<p>{}</p>".format(str(data.columns))
 
+    print("--- Fin de la suppression des colonnes")
+
+
     # Transformations de données
     # Binarisation
     summary_transformation = """<p>Certaines colonnes doivent être binarisée pour représenter ou non la présence d'un objet (comme une vidéo). Binarisation de <strong>video</strong> et <strong>background</strong></p>"""
@@ -148,28 +154,6 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
 
     data.background = data.background.apply(binarize)
     data.video = data.video.apply(binarize)
-
-    # Location
-    if display_explanations:
-        location = "<h5>La colonne location contient un dictionnaire avec plusieurs attributs. On choisit de ne garder que la ville.</h5>"
-        string_to_print += location
-
-    def recup_in_str_location(x):
-        if type(x) == str:
-            return ast.literal_eval(x)['city']
-        else:
-            return None
-    data['location'] = data['location'].apply(recup_in_str_location)
-
-    # Owner
-    if display_explanations:
-        owner = "<h5>owner</h5><p>La colonne <strong>owner</strong> est inutilisable en tant que telle car seules les stats <strong>anonymisées et concernant l'activité publique de lancement de projet</strong> de l'owner nous intéressent.</p>"
-        string_to_print += owner
-
-    def recup_in_str_owner(x):
-        return ast.literal_eval(x['owner'])['stats']
-
-    data['owner'] = data.apply(recup_in_str_owner, axis=1)
 
     # Rewards
     if display_explanations:
@@ -213,12 +197,12 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
     data["main_tag_name_fr"] = data.apply(recup_in_str_main_tag_name_fr, axis=1)
     data["main_tag"] = data.apply(recup_in_str_main_tag, axis=1)
 
-
+    print("--- Fin de la première étape de transformation")
 
     # Retrait de lignes incomplètes
     essentials_columns_names = ['date_start', 'date_end', 'amount_raised', 'comments_count', 'date_start', 'date_end', 'description_fr',
                                 'description_funding_fr', 'description_yourself_fr', 'fans_count',
-                                'goal', 'goal_raised', 'id', 'main_tag', 'name_fr', 'news_count', 'owner', 'percent',
+                                'goal', 'goal_raised', 'id', 'main_tag', 'name_fr', 'news_count', 'percent',
                                 'rewards', 'sponsorships_count', 'subtitle_fr', 'supporters_count']
 
     if display_explanations:
@@ -233,12 +217,37 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
     if display_explanations:
         string_to_print += "</ul>"
 
+    print("--- Fin des drops de projets incomplets ")
+
     if display_explanations:
         string_to_print += "<p>OneHotEncoding des main-tag</p><ul>"
     data = pd.concat([data,pd.get_dummies(data['main_tag_name_fr'])],axis=1)
     data.drop(columns=['main_tag_name_fr',"main_tag"], inplace=True)
 
-    
+    print("--- Début du traitement des données textuelles (c'est long)")
+    #Donnes textuelles
+    summary_donnees_txt = """<p>Afin de traiter les données textuelles comme la description du projet, la description de l'auteur du projet ainsi que le titre et le sous-titre du projet, nous gardons seulement la longueur, le nombre de points d'exclamation et le nombre de points d'interrogations dans ces données</p>"""
+    if display_explanations:
+    	string_to_print += summary_donnees_txt   
+
+    def clean_text(x):
+    	return BeautifulSoup(x, "lxml").text
+    def nb_exclamation(x):
+    	return x.count('!')
+    def nb_interogation(x):
+    	return x.count('?')
+    def prep_text(feature):
+    	data['clean_'+feature] = data[feature].apply(clean_text)
+    	data['len_'+feature] = data['clean_'+feature].apply(len)
+    	data['nb_exclamation_'+feature]=data['clean_'+feature].apply(nb_exclamation)
+    	data['nb_interogation_'+feature]=data['clean_'+feature].apply(nb_interogation)
+    	data.drop(columns=[feature, 'clean_'+feature], inplace=True)
+
+    prep_text('description_fr')
+    prep_text('description_funding_fr')
+    prep_text('description_yourself_fr')
+    prep_text('name_fr')
+    prep_text('subtitle_fr')
 
     # nb_days
     if display_explanations:
@@ -269,7 +278,7 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
 
     def get_nb_rewards(index_project):
         nb = 0
-        for dictionnary in data.rewards[index_project]:
+        for _ in data.rewards[index_project]:
             nb += len(data.rewards[index_project])
         return nb
 
@@ -287,6 +296,12 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
 
     data['post_covid'] = data['date_end'].apply(post_covid)
 
+    # date
+    if display_explanations:
+        date = """<h5>date_*</h5><>Il n'est plus utile de conserver les dates de début et de fin si on dispose des colonnes nb_days et post_covid. Retirons les.</p>"""
+        string_to_print += date
+    data.drop(columns=['date_start', 'date_end'], inplace=True)
+
     # type
     if display_explanations:
         type_project = """<h5>type</h5><p>Les projets fonctionnent différemment selon qu'ils concernent des préventes ou une financement. Il convient donc de séparer le set en deux sous-sets.</p>"""
@@ -299,6 +314,8 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
         string_to_print += """<h5>nb_products_sold</h5><p>Retrait de la colonne <strong>nb_product_sold</strong> pour les projets n'étant pas sous la forme d'une prévente, car cette colonne est équivalente à la colonne <strong>supporters_count</strong>.</p>"""
     data.drop(columns="nb_products_sold", inplace=True)
 
+    print("--- Fin de la préparation")
+    print("-- Début de la generation des csv")
     # Génération d'un CSV propre
     data_pre_covid, data_post_covid = generate_clean_data(data)
 
@@ -308,7 +325,7 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
         data_cat, data_cat_pre_covid, data_cat_post_covid = None, None, None
 
     print("-- Fin de la préparation")
-    return data, data_pre_covid, data_post_covid, string_to_print, data_cat, data_cat_pre_covid, data_cat_post_covid
+    return data, data_pre_covid, data_post_covid, data_cat, data_cat_pre_covid, data_cat_post_covid, string_to_print
 
 
 def generate_clean_data(data: DataFrame) -> Tuple[DataFrame, DataFrame]:
@@ -351,13 +368,17 @@ def generate_clean_data(data: DataFrame) -> Tuple[DataFrame, DataFrame]:
     return data_pre_covid, data_post_covid
 
 def generate_clean_data_cat(data: DataFrame, cat: str) -> Tuple[DataFrame,DataFrame,DataFrame]:
-    data_cat = df.loc[df[cat] == 1]
+    data_cat = data.loc[data[cat] == 1]
 
     data_cat_pre_covid, data_cat_post_covid = generate_clean_data(data_cat)
 
-    file_name= dir_name + "./data/data_cat_covid/clean_data_"+ str(cat) +".csv"
-    file_name_pre_covid= dir_name + "./data/data_cat_covid/pre_covid_data_"+str(cat)+".csv"
-    file_name_post_covid= dir_name + "./data/data_cat_covid/post_covid_data_"+str(cat)+".csv"
+    os.makedirs('data/data_cat_covid', exist_ok=True)
+
+    dir_name ="data/data_cat_covid/data_"+str(cat)
+
+    file_name= dir_name + "/clean_data_"+ str(cat) +".csv"
+    file_name_pre_covid= dir_name + "/pre_covid_data_"+str(cat)+".csv"
+    file_name_post_covid= dir_name + "/post_covid_data_"+str(cat)+".csv"
 
     if not os.path.isfile(file_name):
         data_cat.to_csv(file_name)

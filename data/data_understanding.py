@@ -200,6 +200,12 @@ def understand_data(display_explanations: bool = False) -> Tuple[pd.DataFrame, s
         <p>Il ne nous a pas semblé pertinent de garder la colonne <strong>delivery</strong> car elle peut ne pas avoir de sens si le projet n'offre pas de récompense physique (comme un jeu vidéo ou un film).</p>"""
         string_to_print += project_data
 
+        location = "<h5>location</h5><p>La colonne location contient un dictionnaire avec plusieurs attributs. On choisit de ne rien garder de la localisation du owner car elle est indépendante du projet.</p>"
+        string_to_print += location
+
+        owner = "<h5>owner</h5><p>La colonne <strong>owner</strong> est inutilisable en tant que telle car seules les stats <strong>anonymisées et concernant l'activité publique de lancement de projet</strong> de l'owner nous intéressent.</p><p>De plus, les stats des owners ne peuvent être utilisées : par exemple si un owner a lancé 44 projets, alors pour <strong>chaque</strong> projet, le nombre 44 apparaitra, faisant grossir artificiellement les chiffres. La colonne est donc retirée.</p>"
+        string_to_print += owner
+
         string_to_print += timezone.show_stats(data)
 
         string_to_print += comments_enabled.show_stats(data)

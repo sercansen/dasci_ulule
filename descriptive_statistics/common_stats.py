@@ -39,6 +39,8 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
                           "Technologie",
                           "Patrimoine",
                           "Enfance & Educ."], inplace=True)
+    corr_df.drop(columns=['id', 'type', 'background', 'date_goal_raised',
+                 'goal_raised', 'main_tag', 'payment_methods', 'rewards', 'video', 'visible'], inplace=True)
     fig = plt.figure(1)
     plt.matshow(corr_df.corr(), 1)
 
@@ -71,6 +73,9 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
                           "Enfance & Educ."], inplace=False)
     subtract = corr_df_general.corr().subtract(corr_df.corr())
     plot_corr(subtract)
+    corr_df_general = data_general.drop(columns=['id', 'type', 'background', 'date_goal_raised',
+                                        'goal_raised', 'location', 'main_tag', 'owner', 'payment_methods', 'rewards', 'video', 'visible'], inplace=False)
+    plot_corr(corr_df_general.corr().subtract(corr_df.corr()))
     to_string += get_html_from_fig(fig)
     plt.close(fig)
 
@@ -81,12 +86,10 @@ def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: Data
     pre_covid_df = data_pre_covid.copy(deep=True)
     post_covid_df = data_post_covid.copy(deep=True)
 
-    pre_covid_df.drop(columns=['id', 'date_end', 'date_goal_raised', 'date_start', 'description_fr', 'description_funding_fr', 'description_yourself_fr',
-                      'goal_raised', 'location', 'name_fr', 'owner', 'payment_methods', 'rewards', 'subtitle_fr', 'visible'], inplace=True)
-    post_covid_df.drop(columns=['id', 'date_end', 'date_goal_raised', 'date_start', 'description_fr', 'description_funding_fr', 'description_yourself_fr',
-                       'goal_raised', 'location', 'name_fr', 'owner', 'payment_methods', 'rewards', 'subtitle_fr', 'visible'], inplace=True)
-
-    print(pre_covid_df.columns)
+    pre_covid_df.drop(columns=['id', 'date_goal_raised',
+                      'goal_raised', 'location', 'main_tag', 'owner', 'payment_methods', 'rewards', 'visible'], inplace=True)
+    post_covid_df.drop(columns=['id', 'date_goal_raised',
+                       'goal_raised', 'location', 'main_tag', 'owner', 'payment_methods', 'rewards', 'visible'], inplace=True)
 
     x_pre_covid_scaled = StandardScaler().fit_transform(pre_covid_df.values)
     x_post_covid_scaled = StandardScaler().fit_transform(post_covid_df.values)

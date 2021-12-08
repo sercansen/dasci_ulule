@@ -87,7 +87,7 @@ Une vérification du set sera effectuée afin de ne pas traiter de données pers
     # Chargement des données
     if x == 'tout' or y == 'tout':
         output_name = "tout"
-        if os.path.isfile("./data/clean_data.csv"):
+        if os.path.isfile("./data/clean_data.csv") :
             print("-- Début du chargement des données nettoyées")
             string_to_print += "<h2>Chargement des données du CSV pré-nettoyé</h2>"
             data = load_clean_data()
@@ -97,7 +97,7 @@ Une vérification du set sera effectuée afin de ne pas traiter de données pers
             print("-- Fin du chargement des données")
         else:
             print("-- Début de la préparation des données")
-            data, data_pre_covid, data_post_covid, new_string = prepare_data(
+            data, data_pre_covid, data_post_covid,_,_,_, new_string = prepare_data(
                 display_explanations=display_explanations)
             data_general = data
             string_to_print += new_string
@@ -105,13 +105,19 @@ Une vérification du set sera effectuée afin de ne pas traiter de données pers
 
     else:
         output_name = y
-        print("-- Début du chargement des données nettoyées")
-        string_to_print += "<h2>Chargement des données du CSV pré-nettoyé</h2>"
-        data = load_categorical_data(file_name)
-        data_pre_covid = load_categorical_data(file_name_pre_covid)
-        data_post_covid = load_categorical_data(file_name_post_covid)
-        data_general = load_clean_data()
-        print("-- Fin du chargement des données")
+        if os.path.isfile("./data/clean_data.csv") and os.path.isfile(file_name):
+            print("-- Début du chargement des données catégorielles nettoyées")
+            string_to_print += "<h2>Chargement des données du CSV pré-nettoyé</h2>"
+            data = load_categorical_data(file_name)
+            data_pre_covid = load_categorical_data(file_name_pre_covid)
+            data_post_covid = load_categorical_data(file_name_post_covid)
+            data_general = load_clean_data()
+            print("-- Fin du chargement des données")
+        else:
+            print("-- Début de la préparation des données")
+            data_general, _, _, data, data_pre_covid, data_post_covid, new_string = prepare_data(y,display_explanations=display_explanations)
+            string_to_print += new_string
+            print("-- Fin de la préparation des données")
 
     # Affichage des statistiques descriptives
 
