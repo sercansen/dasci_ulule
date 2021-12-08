@@ -91,11 +91,13 @@ Une vérification du set sera effectuée afin de ne pas traiter de données pers
             data = load_clean_data()
             data_pre_covid = load_pre_covid_data()
             data_post_covid = load_post_covid_data()
+            data_general = load_clean_data()
             print("-- Fin du chargement des données")
         else:
             print("-- Début de la préparation des données")
             data, data_pre_covid, data_post_covid, new_string = prepare_data(
                 display_explanations=display_explanations)
+            data_general = data
             string_to_print += new_string
             print("-- Fin de la préparation des données")
 
