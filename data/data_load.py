@@ -50,7 +50,6 @@ def load_clean_data() -> DataFrame:
     """
 
     df = read_csv("./data/clean_data.csv")
-    _update_data_frame(df)
     return df
 
 
@@ -68,7 +67,6 @@ def load_pre_covid_data() -> DataFrame:
     """
 
     df = read_csv("./data/clean_data_pre_covid.csv")
-    _update_data_frame(df)
     return df
 
 
@@ -85,7 +83,6 @@ def load_post_covid_data() -> DataFrame:
         Les données chargées.
     """
     df = read_csv("./data/clean_data_post_covid.csv")
-    _update_data_frame(df)
     return df
 
 
@@ -103,26 +100,6 @@ def load_categorical_data(file_name) -> DataFrame:
     """
 
     df = read_csv(file_name)
-    _update_data_frame(df)
     return df
 
 
-def _update_data_frame(data_frame: DataFrame) -> None:
-    """
-    Retransforme les chaînes de caractères en dictionnaires dans les colonnes concernées.
-
-    Paramètres
-    -------- 
-    data_frame : DataFrame
-        Le data frame contenant les données à actualiser.
-    """
-    # def update_col_main_tag(x):
-    #     if type(x["main_tag"]) == str:
-    #         return ast.literal_eval(x["main_tag"])
-
-    def update_col_rewards(x):
-        if type(x["rewards"]) == str:
-            return ast.literal_eval(x["rewards"])
-
-
-    data_frame["rewards"] = data_frame.apply(update_col_rewards, axis=1)

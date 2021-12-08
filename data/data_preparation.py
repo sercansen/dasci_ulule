@@ -75,6 +75,7 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
                        'currency',
                        'currency_display',
                        'date_end_extra_time',
+                       'date_goal_raised',
                        'delivery',
                        'description_ca',
                        'description_de',
@@ -113,6 +114,7 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
                        'name_it',
                        'name_nl',
                        'name_pt',
+                       'payment_methods',
                        'orders_count',
                        'owner',
                        'required_personal_id_number',
@@ -226,22 +228,42 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
 
     print("--- Début du traitement des données textuelles (c'est long)")
     #Donnes textuelles
+    # nb_rewards
+    if display_explanations:
+        string_to_print += "<h5>nb_rewards</h5><p>Création de la colonne nb_rewards.</p>"
+
+    def get_nb_rewards(index_project):
+        nb = 0
+        for _ in data.rewards[index_project]:
+            nb += len(data.rewards[index_project])
+        return nb
+
+    list_nb_reward = [get_nb_rewards(k) for k in data.rewards.index]
+    data["nb_rewards"] = list_nb_reward
+    data.drop(columns=["rewards"], inplace=True)
+
+    # Donnes textuelles
     summary_donnees_txt = """<p>Afin de traiter les données textuelles comme la description du projet, la description de l'auteur du projet ainsi que le titre et le sous-titre du projet, nous gardons seulement la longueur, le nombre de points d'exclamation et le nombre de points d'interrogations dans ces données</p>"""
     if display_explanations:
-    	string_to_print += summary_donnees_txt   
+        string_to_print += summary_donnees_txt
 
     def clean_text(x):
-    	return BeautifulSoup(x, "lxml").text
+        return BeautifulSoup(x, "lxml").text
+
     def nb_exclamation(x):
-    	return x.count('!')
+        return x.count('!')
+
     def nb_interogation(x):
-    	return x.count('?')
+        return x.count('?')
+
     def prep_text(feature):
-    	data['clean_'+feature] = data[feature].apply(clean_text)
-    	data['len_'+feature] = data['clean_'+feature].apply(len)
-    	data['nb_exclamation_'+feature]=data['clean_'+feature].apply(nb_exclamation)
-    	data['nb_interogation_'+feature]=data['clean_'+feature].apply(nb_interogation)
-    	data.drop(columns=[feature, 'clean_'+feature], inplace=True)
+        data['clean_'+feature] = data[feature].apply(clean_text)
+        data['len_'+feature] = data['clean_'+feature].apply(len)
+        data['nb_exclamation_'+feature] = data['clean_' +
+                                               feature].apply(nb_exclamation)
+        data['nb_interogation_'+feature] = data['clean_' +
+                                                feature].apply(nb_interogation)
+        data.drop(columns=[feature, 'clean_'+feature], inplace=True)
 
     prep_text('description_fr')
     prep_text('description_funding_fr')
@@ -264,26 +286,13 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
 
     # news_per_days
     if display_explanations:
-        string_to_print += "<h5>news_per_days</h5><p>Création de la colonne news_per_days</p>"
+        string_to_print += "<h5>news_per_days</h5><p>Création de la colonne news_per_days.</p>"
     col = (data["news_count"]/data["nb_days"]
            ).apply(lambda x: 0 if np.isnan(x) or np.isinf(x) else x)
     data["news_per_days"] = col
     zero_day_projects = data[data["nb_days"] == 0]
     # on enlève les projets ayant duré moins de 24h, il y en a 9 dont un seul financé
     data.drop(index=zero_day_projects.index, inplace=True)
-
-    # nb_rewards
-    if display_explanations:
-        string_to_print += "<h5>nb_rewards</h5><p>Création de la colonne nb_rewards</p>"
-
-    def get_nb_rewards(index_project):
-        nb = 0
-        for _ in data.rewards[index_project]:
-            nb += len(data.rewards[index_project])
-        return nb
-
-    list_nb_reward = [get_nb_rewards(k) for k in data.rewards.index]
-    data["nb_rewards"] = list_nb_reward
 
     # pre-post Covid
     if display_explanations:
@@ -298,7 +307,7 @@ def prepare_data(cat : str = None, display_explanations: bool = False) -> Tuple[
 
     # date
     if display_explanations:
-        date = """<h5>date_*</h5><>Il n'est plus utile de conserver les dates de début et de fin si on dispose des colonnes nb_days et post_covid. Retirons les.</p>"""
+        date = """<h5>date_*</h5><p>Il n'est plus utile de conserver les dates de début et de fin si on dispose des colonnes nb_days et post_covid. Retirons les.</p>"""
         string_to_print += date
     data.drop(columns=['date_start', 'date_end'], inplace=True)
 

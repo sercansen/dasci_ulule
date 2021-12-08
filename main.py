@@ -12,6 +12,8 @@ from data.data_preparation import prepare_data
 from data.data_load import load_clean_data, load_post_covid_data, load_pre_covid_data, load_categorical_data
 import os
 import pdfkit
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module='bs4')
 
 
 def main(display_explanations=False) -> None:

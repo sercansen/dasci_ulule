@@ -104,7 +104,7 @@ def understand_data(display_explanations: bool = False) -> Tuple[pd.DataFrame, s
             <li><del>committed</del></li>
             <li>date_end</li>
             <li>date_end_extra_time</li>
-            <li>date_goal_raised</li>
+            <li><del>date_goal_raised</del></li>
             <li>date_start</li>
             <li>fans_count</li>
             <li><del>finished</del></li>
@@ -124,6 +124,9 @@ def understand_data(display_explanations: bool = False) -> Tuple[pd.DataFrame, s
         <p>Afin de ne pas biaiser notre modèle, nous ne nous intéresserons pas aux projets encore en cours. Les variables <strong>time_left</strong>, <strong>time_left_short</strong>, <strong>is_in_extra_time</strong> ainsi que <strong>finished</strong> (après le retrait des projets inachevés) ne sont donc pas pertinentes. De même, les projets annulés doivent être retirés, ainsi que la colonne <strong>is_cancelled</strong>.</p>
         """
         string_to_print += set_analysis
+
+        goal_raised = "<h5>date_goal_raised</h5><p>La colonne <strong>date_goal_raised</strong> est incompatible avec notre problématique : conseiller les lanceurs de projets pour qu'ils réussissent leur projet. Elle est donc retirée.</p>"
+        string_to_print += goal_raised
 
         string_to_print += date_end_extra_time.show_stats(data)
 
@@ -181,7 +184,7 @@ def understand_data(display_explanations: bool = False) -> Tuple[pd.DataFrame, s
             <li><del>name_nl</del></li>
             <li><del>name_pt</del></li>
             <li>owner</li>
-            <li>payment_methods</li>
+            <li><del>payment_methods</del></li>
             <li>rewards</li>
             <li>sponsorships_count</li>
             <li><del>subtitle_ca</del></li>
@@ -205,6 +208,9 @@ def understand_data(display_explanations: bool = False) -> Tuple[pd.DataFrame, s
 
         owner = "<h5>owner</h5><p>La colonne <strong>owner</strong> est inutilisable en tant que telle car seules les stats <strong>anonymisées et concernant l'activité publique de lancement de projet</strong> de l'owner nous intéressent.</p><p>De plus, les stats des owners ne peuvent être utilisées : par exemple si un owner a lancé 44 projets, alors pour <strong>chaque</strong> projet, le nombre 44 apparaitra, faisant grossir artificiellement les chiffres. La colonne est donc retirée.</p>"
         string_to_print += owner
+
+        payment_methods = "<h5>payment_methods</h5><p>La gestion des moyens de paiements ne nous a pas semblé pertinente. Colonne retirée.</p>"
+        string_to_print += payment_methods
 
         string_to_print += timezone.show_stats(data)
 
