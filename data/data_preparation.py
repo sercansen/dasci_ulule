@@ -21,7 +21,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 
-def prepare_data(cat: str = None, display_explanations: bool = False) -> Tuple[DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, DataFrame, str]:
+def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFrame, DataFrame, dict, str]:
     """
     Prépare les données pour l'étude à venir.
     Retire les colonnes inutiles, les projets ne répondant pas à certains
@@ -321,20 +321,20 @@ def prepare_data(cat: str = None, display_explanations: bool = False) -> Tuple[D
     if display_explanations:
         string_to_print += """<h5>nb_products_sold</h5><p>Retrait de la colonne <strong>nb_product_sold</strong> pour les projets n'étant pas sous la forme d'une prévente, car cette colonne est équivalente à la colonne <strong>supporters_count</strong>.</p>"""
     data.drop(columns="nb_products_sold", inplace=True)
-
     print("--- Fin de la préparation")
-    print("-- Début de la generation des csv")
+
+    print("-- Début de la generation des csv généraux")
     # Génération d'un CSV propre
     data_pre_covid, data_post_covid = generate_clean_data(data)
+    print("-- Fin de la génération des csv généraux")
 
-    if cat is not None:
-        data_cat, data_cat_pre_covid, data_cat_post_covid = generate_clean_data_cat(
-            data, cat)
-    else:
-        data_cat, data_cat_pre_covid, data_cat_post_covid = None, None, None
+    print("-- Début de la génération des dataframe catégoriels")
+    dict_cat_df = generate_clean_data_cat_all(
+        data, data_pre_covid, data_post_covid)
+    print("-- Fin de la génération des dataframes catégoriels")
 
     print("-- Fin de la préparation")
-    return data, data_pre_covid, data_post_covid, data_cat, data_cat_pre_covid, data_cat_post_covid, string_to_print
+    return data, data_pre_covid, data_post_covid, dict_cat_df, string_to_print
 
 
 def generate_clean_data(data: DataFrame) -> Tuple[DataFrame, DataFrame]:
@@ -376,10 +376,27 @@ def generate_clean_data(data: DataFrame) -> Tuple[DataFrame, DataFrame]:
     return data_pre_covid, data_post_covid
 
 
-def generate_clean_data_cat(data: DataFrame, cat: str) -> Tuple[DataFrame, DataFrame, DataFrame]:
-    data_cat = data.loc[data[cat] == 1]
+def generate_clean_data_cat_all(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: DataFrame) -> dict:
+    dict_cat_df = {}
+    cat_list = ["Art & Photo", "Artisanat & Cuisine", "Autres projets",
+                "BD", "Edition & Journal.", "Enfance & Educ.", "Film et vidéo",
+                "Jeux", "Mode & Design", "Musique", "Patrimoine", "Santé & Bien-être",
+                "Solidaire & Citoyen", "Spectacle vivant", "Sports", "Technologie"]
+    for cat in cat_list:
 
-    data_cat_pre_covid, data_cat_post_covid = generate_clean_data(data_cat)
+        data_cat, data_pre_covid_cat, data_post_covid_cat = generate_clean_data_cat(
+            data, data_pre_covid, data_post_covid, cat)
+
+        dict_cat_df["data_" + cat] = data_cat
+        dict_cat_df["data_pre_covid_" + cat] = data_pre_covid_cat
+        dict_cat_df["data_post_covid_" + cat] = data_post_covid_cat
+    return dict_cat_df
+
+
+def generate_clean_data_cat(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: DataFrame, cat: str) -> Tuple[DataFrame, DataFrame, DataFrame]:
+    data_cat = data.loc[data[cat] == 1]
+    data_cat_pre_covid = data_pre_covid.loc[data_pre_covid[cat] == 1]
+    data_cat_post_covid = data_post_covid.loc[data_post_covid[cat] == 1]
 
     os.makedirs('data/data_cat_covid', exist_ok=True)
 

@@ -8,11 +8,13 @@ main
 """
 
 from descriptive_statistics.main_descriptive_stats import show_stats
-from data.data_preparation import prepare_data
+from data.data_preparation import generate_clean_data_cat_all, prepare_data
 from data.data_load import load_clean_data, load_post_covid_data, load_pre_covid_data, load_categorical_data
 import os
 import pdfkit
 import warnings
+
+from ml_models.main_machine_learning import machine_learning
 warnings.filterwarnings("ignore", category=UserWarning, module='bs4')
 
 
@@ -34,7 +36,7 @@ def main(display_explanations=False) -> None:
     print("Souhaitez-vous faire l'analyse de toutes les données (entrez 'tout') ou seulement d'une catégorie (entrez 'cat') ?")
     x = input()
     print("Vous avez choisi ", x)
-    y = 0
+    y = "tout"
 
     if x == 'cat':
         tags_possibles = ["Solidaire & Citoyen",
@@ -86,50 +88,44 @@ def main(display_explanations=False) -> None:
         string_to_print += """<h5>Note :</h5><p>Cette étude est basée principalement sur un set de données obtenu via l'API publique d'Ulule, avec l'autorisation du site par e-mail.
 Une vérification du set sera effectuée afin de ne pas traiter de données personnelles.</p>"""
 
-    # Chargement des données
-    if x == 'tout' or y == 'tout':
-        output_name = "tout"
-        if os.path.isfile("./data/clean_data.csv"):
-            print("-- Début du chargement des données nettoyées")
-            string_to_print += "<h2>Chargement des données du CSV pré-nettoyé</h2>"
-            data = load_clean_data()
-            data_pre_covid = load_pre_covid_data()
-            data_post_covid = load_post_covid_data()
-            data_general = load_clean_data()
-            print("-- Fin du chargement des données")
-        else:
-            print("-- Début de la préparation des données")
-            data, data_pre_covid, data_post_covid, _, _, _, new_string = prepare_data(
-                display_explanations=display_explanations)
-            data_general = data
-            string_to_print += new_string
-            print("-- Fin de la préparation des données")
-
+    # Chargement des données générales
+    print("- Début du chargement des données")
+    if os.path.isfile("./data/clean_data.csv"):
+        string_to_print += "<h2>Chargement des données du CSV pré-nettoyé</h2>"
+        data = load_clean_data()
+        data_pre_covid = load_pre_covid_data()
+        data_post_covid = load_post_covid_data()
+        print("-- Début du chargement des données catégorielles")
+        dict_df_cat = generate_clean_data_cat_all(
+            data, data_pre_covid, data_post_covid)
+        print("-- Fin du chargement des données catégorielles")
     else:
-        output_name = y
-        if os.path.isfile("./data/clean_data.csv") and os.path.isfile(file_name):
-            print("-- Début du chargement des données catégorielles nettoyées")
-            string_to_print += "<h2>Chargement des données du CSV pré-nettoyé</h2>"
-            data = load_categorical_data(file_name)
-            print(file_name_pre_covid, file_name_post_covid)
-            data_pre_covid = load_categorical_data(file_name_pre_covid)
-            data_post_covid = load_categorical_data(file_name_post_covid)
-            data_general = load_clean_data()
-            print("-- Fin du chargement des données")
-        else:
-            print("-- Début de la préparation des données")
-            data_general, _, _, data, data_pre_covid, data_post_covid, new_string = prepare_data(
-                y, display_explanations=display_explanations)
-            string_to_print += new_string
-            print("-- Fin de la préparation des données")
+        print("-- Début de la préparation des données")
+        data, data_pre_covid, data_post_covid, dict_df_cat, new_string = prepare_data(
+            display_explanations=display_explanations)
+        string_to_print += new_string
+        print("-- Fin de la préparation des données")
+    print("- Fin du chargement des données")
 
     # Affichage des statistiques descriptives
-
     if display_explanations:
-        string_to_print += show_stats(data, data_pre_covid,
-                                      data_post_covid, data_general, not (x == 'tout' or y == 'tout'))
+        if x != "tout" and y != "tout":
+            data_cat = dict_df_cat["data_" + y]
+            data_cat_pre_covid = dict_df_cat["data_pre_covid_" + y]
+            data_cat_post_covid = dict_df_cat["data_post_covid_" + y]
+            string_to_print += show_stats(data_cat, data_cat_pre_covid,
+                                          data_cat_post_covid, data, True)
+        else:
+            string_to_print += show_stats(data, data_pre_covid,
+                                          data_post_covid, data, False)
+
+    # Machine Learning
+    print("- Début du machine learning")
+    string_to_print += machine_learning(y, dict_df_cat)
+    print("- Fin du machine learning")
 
     # Génération du pdf de sortie
+    print("- Début de la génération du pdf")
     pdfkit_safe_name = {"tout": "tout",
                         "Solidaire & Citoyen": "solidaire_citoyen",
                         "Santé & Bien-être": "sante_bien_etre",
@@ -147,10 +143,10 @@ Une vérification du set sera effectuée afin de ne pas traiter de données pers
                         "Technologie": "technologie",
                         "Patrimoine": "patrimoine",
                         "Enfance & Educ.": "enfance_educ"}
-    output_file_name = "out/" + pdfkit_safe_name[output_name] + ".pdf"
+    output_file_name = "out/" + pdfkit_safe_name[y] + ".pdf"
     pdfkit.from_string(string_to_print, output_path=output_file_name,
                        css="./styles/styles.css")
-    print("-- Fin de la génération du pdf")
+    print("- Fin de la génération du pdf")
 
 
 if __name__ == '__main__':
