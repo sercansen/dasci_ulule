@@ -121,7 +121,8 @@ Une vérification du set sera effectuée afin de ne pas traiter de données pers
 
     # Machine Learning
     print("- Début du machine learning")
-    string_to_print += machine_learning(y, dict_df_cat)
+    string_to_print += machine_learning(y, data,
+                                        data_pre_covid, data_post_covid, dict_df_cat)
     print("- Fin du machine learning")
 
     # Génération du pdf de sortie
