@@ -1,7 +1,6 @@
 from pandas import DataFrame
 from ml_models import mlp
-
-
+from preparation_for_ml import prep_data_ml
 def machine_learning(cat_name: str, data_general: DataFrame, data_pre_covid: DataFrame, data_post_covid: DataFrame, dict_df: dict) -> str:
 
     to_print = """"""
