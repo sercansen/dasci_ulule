@@ -13,7 +13,7 @@ from utils.utils import get_html_from_fig
 def show_stats(data: DataFrame, data_pre_covid: DataFrame, data_post_covid: DataFrame, data_general: DataFrame, are_stats_cat: bool) -> str:
     """#TODO"""
 
-    to_string = "<h4>Autres stats ? NOMMER CA AUTREMENT SVP</h4>"
+    to_string = "<h4>Statistiques générales</h4>"
 
     to_string += "<h5>Matrice de corrélation</h5>"
 
