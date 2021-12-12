@@ -22,6 +22,9 @@ def machine_learning(cat_name: str, data_general: DataFrame, data_pre_covid: Dat
         to_print += confusion_matrix(y_test, log_reg_preds)
         to_print += roc_curve(X_test, y_test, log_reg_model)
 
+        to_print += "<h3>Application d'un Multi Layer Perceptron</</h3>"
+        to_print += mlp.mlp(data_general)
+
         #On prépare les données precovid
         data_pre_covid = data_pre_covid.set_index('Unnamed: 0')
         X_train, X_test, y_train, y_test = prep_data_ml(data_pre_covid)
@@ -44,7 +47,15 @@ def machine_learning(cat_name: str, data_general: DataFrame, data_pre_covid: Dat
         data_cat_general = data_cat_general.set_index('Unnamed: 0')
         X_train, X_test, y_train, y_test = prep_data_ml(data_cat_general)
 
-    return to_print
+        #TODO On applique les algos de ML sur les données générales
+        to_print += "<h3>Régression logistique</h3>"
+        log_reg_model, log_reg_preds, txt = log_reg(X_train, X_test, y_train, y_test)
+        to_print += txt
+        to_print += confusion_matrix(y_test, log_reg_preds)
+        to_print += roc_curve(X_test, y_test, log_reg_model)
+
+        to_print += "<h3>Application d'un Multi Layer Perceptron</</h3>"
+        to_print += mlp.mlp(data_cat_general)
 
         #On prépare les données precovid
         data_cat_pre_covid = data_cat_pre_covid.set_index('Unnamed: 0')
@@ -58,5 +69,4 @@ def machine_learning(cat_name: str, data_general: DataFrame, data_pre_covid: Dat
 
         #TODO On applique les algos de ML sur les données post_covid
         
-        pass
     return to_print
