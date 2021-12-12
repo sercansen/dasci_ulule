@@ -3,7 +3,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
 
-def prep_data_ml(data: pd.Dataframe):
+def prep_data_ml(data: pd.DataFrame):
     df = data.drop(columns=['goal_raised', 'amount_raised', 'comments_count',
                    'fans_count', 'id', 'percent', 'supporters_count', 'type'])
     X_train, X_test, y_train, y_test = train_test_split(
