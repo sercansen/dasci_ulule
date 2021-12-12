@@ -19,8 +19,9 @@ def machine_learning(cat_name: str, data_general: DataFrame, data_pre_covid: Dat
         data_cat_post_covid = dict_df["data_post_covid_" + cat_name]
 
         # INSERER ML ICI
-
+    print("-- Début du MLP")
     to_print += "<h2>Application d'un Multi Layer Perceptron</h2>"
     to_print += mlp.mlp(data_general)
+    print("-- Fin du MLP")
 
     return to_print

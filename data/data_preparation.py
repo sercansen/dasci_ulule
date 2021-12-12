@@ -143,6 +143,7 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
         string_to_print += "<p>{}</p>".format(str(data.columns))
 
     print("--- Fin de la suppression des colonnes")
+    print("--- Début de la première étape de transformation")
 
     # Transformations de données
     # Binarisation
@@ -199,6 +200,7 @@ def prepare_data(display_explanations: bool = False) -> Tuple[DataFrame, DataFra
     data["main_tag"] = data.apply(recup_in_str_main_tag, axis=1)
 
     print("--- Fin de la première étape de transformation")
+    print("--- Début des drops de projets incomplets ")
 
     # Retrait de lignes incomplètes
     essentials_columns_names = ['date_start', 'date_end', 'amount_raised', 'comments_count', 'date_start', 'date_end', 'description_fr',
