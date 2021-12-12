@@ -1,6 +1,7 @@
 from pandas import DataFrame
 from ml_models.prep_stat import prep_data_ml, confusion_matrix, roc_curve
 from ml_models.model_building import log_reg
+from ml_models import mlp
 
 import matplotlib.pyplot as plt
 
@@ -43,7 +44,7 @@ def machine_learning(cat_name: str, data_general: DataFrame, data_pre_covid: Dat
         data_cat_general = data_cat_general.set_index('Unnamed: 0')
         X_train, X_test, y_train, y_test = prep_data_ml(data_cat_general)
 
-        #TODO On applique les algos de ML sur les données générales
+    return to_print
 
         #On prépare les données precovid
         data_cat_pre_covid = data_cat_pre_covid.set_index('Unnamed: 0')
