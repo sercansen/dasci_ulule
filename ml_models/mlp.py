@@ -68,13 +68,17 @@ def dataframe_to_dataloaders(dataframe):
 
 
 class MLP(nn.Module):
-    def __init__(self, n_features, n_hidden_1, n_hidden_2, n_output):
+    def __init__(self, n_features, n_hidden_1, n_hidden_2, n_hidden_3, n_hidden_4, n_output):
         super(MLP, self).__init__()
         self.fc0 = nn.Linear(n_features, n_hidden_1)
         self.fc1 = nn.Linear(n_hidden_1, n_hidden_2)
-        self.fc2 = nn.Linear(n_hidden_2, n_output)
+        self.fc2 = nn.Linear(n_hidden_2, n_hidden_3)
+        self.fc3 = nn.Linear(n_hidden_3, n_hidden_4)
+        self.fc4 = nn.Linear(n_hidden_4, n_output)
         self.rel0 = nn.ReLU()
         self.rel1 = nn.ReLU()
+        self.rel2 = nn.ReLU()
+        self.rel3 = nn.ReLU()
         self.drop = nn.Dropout(0.3)
         self.sig = nn.Sigmoid()
 
@@ -83,8 +87,12 @@ class MLP(nn.Module):
         x = self.rel0(x)
         x = self.fc1(x)
         x = self.rel1(x)
-        x = self.drop(x)
         x = self.fc2(x)
+        x = self.rel2(x)
+        x = self.fc3(x)
+        x = self.rel3(x)
+        x = self.drop(x)
+        x = self.fc4(x)
         x = self.sig(x)
 
         return x
@@ -192,7 +200,7 @@ def mlp(dataframe) -> str:
         dataframe)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    model_MLP = MLP(shape, 100, 100, 1)
+    model_MLP = MLP(shape, 50, 100, 100, 50, 1)
     model_MLP.to(device=device)
 
     criterion = nn.BCELoss()  # specify loss function
